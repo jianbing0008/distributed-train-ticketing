@@ -1,9 +1,9 @@
 package com.jiawa.train.common.exception;
 
+//注意不能在枚举类上使用lombok的Data注解来自动生成getter/setter
 public enum BusinessExceptionEnum {
 
-    MEMBER_MOBILE_EXIST("手机号已注册"),
-    ;
+    MEMBER_MOBILE_EXIST("手机号已注册");
 
     private String desc;
 
@@ -19,5 +19,10 @@ public enum BusinessExceptionEnum {
         this.desc = desc;
     }
 
-
+    @Override
+    public String toString() {
+        return "BusinessExceptionEnum{" +
+                "desc='" + desc + '\'' +
+                '}';
+    }
 }
