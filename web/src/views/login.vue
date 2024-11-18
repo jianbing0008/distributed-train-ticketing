@@ -40,6 +40,7 @@
 <script>
 import { defineComponent, reactive } from 'vue';
 import axios from "axios";
+import {notification} from "ant-design-vue";
 //import { useRouter } from 'vue-router'
 
 export default defineComponent({
@@ -48,7 +49,7 @@ export default defineComponent({
     //const router = useRouter();
 
     const loginForm = reactive({
-      mobile: '',
+      mobile: '13958858054',
       code: '',
     });
 
@@ -57,13 +58,45 @@ export default defineComponent({
         mobile: loginForm.mobile
       }).then(response => {
         console.log(response);
+        let data = response.data; //response.data == 后端的CommonResp
+        if (data.success) {
+          notification.success({
+            description: '验证码发送成功，请注意查收'
+          })
+
+        } else {
+          notification.error({
+            description: data.message
+          });
+        }
+      });
+    };
+
+    const login = () => {
+      axios.post("http://localhost:8000/member/member/login", {
+        mobile: loginForm.mobile,
+        code: loginForm.code
+      }).then(response => {
+        console.log(response);
+        let data = response.data; //response.data == 后端的CommonResp
+        if (data.success) {
+          notification.success({
+            description: '登录成功！'
+          })
+          console.log("登录成功： ",data.content);
+        } else {
+          notification.error({
+            description: data.message
+          });
+        }
       });
     };
 
 
     return {
       loginForm,
-      sendCode
+      sendCode,
+      login
     };
   },
 });

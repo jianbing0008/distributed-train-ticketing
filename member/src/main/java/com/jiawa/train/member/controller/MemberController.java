@@ -40,7 +40,7 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public CommonResp<MemberLoginResp> login(@Valid MemberLoginReq req) {
+    public CommonResp<MemberLoginResp> login(@Valid @RequestBody MemberLoginReq req) {
         MemberLoginResp Resp = memberService.login(req);
         return new CommonResp<>(Resp);
     }
