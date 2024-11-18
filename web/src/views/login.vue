@@ -39,6 +39,7 @@
 
 <script>
 import { defineComponent, reactive } from 'vue';
+import axios from "axios";
 //import { useRouter } from 'vue-router'
 
 export default defineComponent({
@@ -51,9 +52,18 @@ export default defineComponent({
       code: '',
     });
 
+    const sendCode = () => {
+      axios.post("http://localhost:8000/member/member/send-code", {
+        mobile: loginForm.mobile
+      }).then(response => {
+        console.log(response);
+      });
+    };
+
 
     return {
       loginForm,
+      sendCode
     };
   },
 });
