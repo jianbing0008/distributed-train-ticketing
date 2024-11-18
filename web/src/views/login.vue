@@ -22,7 +22,7 @@
         >
           <a-input v-model:value="loginForm.code">
             <template #addonAfter>
-              <a @click="1">获取验证码</a>
+              <a @click="sendCode">获取验证码</a>
             </template>
           </a-input>
           <!--<a-input v-model:value="loginForm.code" placeholder="验证码"/>-->

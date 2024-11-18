@@ -9,14 +9,16 @@ mobile =12345678900
 
 ###
 POST http://localhost:8000/member/member/send-code
-Content-Type: application/x-www-form-urlencoded
+Content-Type: application/json
 
-mobile =13958858056
+{
+    "mobile":"13958858059"
+}
 
 ###
 POST http://localhost:8000/member/member/login
 Content-Type: application/x-www-form-urlencoded
 
-mobile =13958858059&code=8888
+mobile =13958858059& code=8888
 
 ###
