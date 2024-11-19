@@ -48,12 +48,12 @@
 import { defineComponent, reactive } from 'vue';
 import axios from "axios";
 import {notification} from "ant-design-vue";
-//import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   name: "login-view",
   setup() {
-    //const router = useRouter();
+    const router = useRouter();
 
     // 登录表单数据模型
     const loginForm = reactive({
@@ -74,7 +74,6 @@ export default defineComponent({
           notification.success({
             description: '验证码发送成功，请注意查收'
           })
-
         } else {
           notification.error({
             description: data.message
@@ -98,6 +97,7 @@ export default defineComponent({
             description: '登录成功！'
           })
           console.log("登录成功： ",data.content);
+          router.push('/'); // 登录成功，跳转到控制台主页
         } else {
           notification.error({
             description: data.message
