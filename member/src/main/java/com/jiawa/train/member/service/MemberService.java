@@ -3,9 +3,9 @@ package com.jiawa.train.member.service;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.jwt.JWTUtil;
 import com.jiawa.train.common.exception.BusinessException;
 import com.jiawa.train.common.exception.BusinessExceptionEnum;
+import com.jiawa.train.common.util.JwtUtil;
 import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.member.domain.Member;
 import com.jiawa.train.member.domain.MemberExample;
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -108,14 +107,8 @@ public class MemberService {
         // 验证通过，返回用户信息
         MemberLoginResp memberLoginResp = BeanUtil.copyProperties(memberDB, MemberLoginResp.class);
 
-        // 将MemberLoginResp对象转换为Map对象，以便于后续创建JWT令牌
-        Map<String, Object> map = BeanUtil.beanToMap(memberLoginResp);
-
-        // 定义用于JWT签名的密钥
-        String key = "JianBing123006";
-
         // 使用memberLoginResp对象的属性值和密钥创建JWT令牌
-        String token = JWTUtil.createToken(map, key.getBytes());
+        String token = JwtUtil.createToken(memberLoginResp.getId(),memberLoginResp.getMobile());
 
         // 将生成的JWT令牌设置到memberLoginResp对象中
         memberLoginResp.setToken(token);
