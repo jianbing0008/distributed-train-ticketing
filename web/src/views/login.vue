@@ -1,12 +1,17 @@
 <template>
+  <!-- 登录界面布局 -->
   <a-row class="login">
+    <!-- 中央列设置，用于登录表单 -->
     <a-col :span="8" :offset="8" class="login-main">
+      <!-- 登录标题和图标 -->
       <h1 style="text-align: center"><rocket-two-tone />&nbsp;12306售票系统</h1>
+      <!-- 登录表单 -->
       <a-form
           :model="loginForm"
           name="basic"
           autocomplete="off"
       >
+        <!-- 手机号输入框 -->
         <a-form-item
             label=""
             name="mobile"
@@ -15,6 +20,7 @@
           <a-input v-model:value="loginForm.mobile" placeholder="手机号"/>
         </a-form-item>
 
+        <!-- 验证码输入框和获取验证码按钮 -->
         <a-form-item
             label=""
             name="code"
@@ -28,6 +34,7 @@
           <!--<a-input v-model:value="loginForm.code" placeholder="验证码"/>-->
         </a-form-item>
 
+        <!-- 登录按钮 -->
         <a-form-item>
           <a-button type="primary" block @click="login">登录</a-button>
         </a-form-item>
@@ -48,16 +55,20 @@ export default defineComponent({
   setup() {
     //const router = useRouter();
 
+    // 登录表单数据模型
     const loginForm = reactive({
       mobile: '13958858054',
       code: '',
     });
 
+    /**
+     * 发送验证码函数
+     * 通过axios向后端发送请求，获取验证码
+     */
     const sendCode = () => {
       axios.post("http://localhost:8000/member/member/send-code", {
         mobile: loginForm.mobile
       }).then(response => {
-        console.log(response);
         let data = response.data; //response.data == 后端的CommonResp
         if (data.success) {
           notification.success({
@@ -72,12 +83,15 @@ export default defineComponent({
       });
     };
 
+    /**
+     * 登录函数
+     * 通过axios向后端发送登录请求，验证用户身份
+     */
     const login = () => {
       axios.post("http://localhost:8000/member/member/login", {
         mobile: loginForm.mobile,
         code: loginForm.code
       }).then(response => {
-        console.log(response);
         let data = response.data; //response.data == 后端的CommonResp
         if (data.success) {
           notification.success({
@@ -103,6 +117,7 @@ export default defineComponent({
 </script>
 
 <style>
+/* 设置登录主要区域的样式 */
 .login-main h1 {
   font-size: 25px;
   font-weight: bold;

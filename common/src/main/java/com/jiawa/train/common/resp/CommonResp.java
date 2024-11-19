@@ -19,6 +19,12 @@ public class CommonResp<T> {
     public CommonResp() {
     }
 
+    /**
+     * 构造一个CommonResp对象
+     * 该构造函数允许将指定内容封装到响应对象中
+     *
+     * @param content 响应内容，可以是任意类型的数据
+     */
     public CommonResp(T content) {
         this.content = content;
     }
