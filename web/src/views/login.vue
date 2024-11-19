@@ -66,7 +66,7 @@ export default defineComponent({
      * 通过axios向后端发送请求，获取验证码
      */
     const sendCode = () => {
-      axios.post("http://localhost:8000/member/member/send-code", {
+      axios.post("/member/member/send-code", {
         mobile: loginForm.mobile
       }).then(response => {
         let data = response.data; //response.data == 后端的CommonResp
@@ -88,7 +88,7 @@ export default defineComponent({
      * 通过axios向后端发送登录请求，验证用户身份
      */
     const login = () => {
-      axios.post("http://localhost:8000/member/member/login", {
+      axios.post("/member/member/login", {
         mobile: loginForm.mobile,
         code: loginForm.code
       }).then(response => {
