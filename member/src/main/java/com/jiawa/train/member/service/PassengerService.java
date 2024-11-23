@@ -62,7 +62,7 @@ public class PassengerService {
         if(ObjectUtil.isNotNull(req.getMemberId())){
             criteria.andMemberIdEqualTo(req.getMemberId());
         }
-        PageHelper.startPage(1,2);
+        PageHelper.startPage(req.getPage(),req.getSize());
         // 根据构造的查询条件，从数据库中选择符合条件的乘客信息
         List<Passenger> passengerList = passengerMapper.selectByExample(passengerExample);
         return BeanUtil.copyToList(passengerList, PassengerQueryResp.class);
