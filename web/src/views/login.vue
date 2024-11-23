@@ -98,7 +98,7 @@ export default defineComponent({
             description: '登录成功！'
           })
           console.log("登录成功： ",data.content);
-          router.push('/'); // 登录成功，跳转到控制台主页
+          router.push('/welcome'); // 登录成功，跳转到控制台主页
           store.commit('setMember',data.content)
         } else {
           notification.error({
