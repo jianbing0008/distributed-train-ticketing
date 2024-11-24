@@ -1,7 +1,10 @@
 <template>
   <!--p防止与下面元素重叠 -->
   <p>
-    <a-button type="primary" @click="showModal">新增</a-button>
+    <a-space>
+      <a-button type="primary" @click="handlerQuery()">刷新</a-button>
+      <a-button type="primary" @click="showModal">新增</a-button>
+    </a-space>
   </p>
 
   <!--乘车人员展示-->
@@ -102,6 +105,12 @@ export default defineComponent({
     };
 
     const handlerQuery = param => {
+      if(!param) {
+        param = {
+          page: 1,
+          size: pagination.pageSize
+        };
+      }
       axios.get("/member/passenger/query-list",{
         params:{
           page: param.page,
