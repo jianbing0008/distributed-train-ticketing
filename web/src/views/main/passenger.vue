@@ -1,5 +1,12 @@
 <template>
-  <a-button type="primary" @click="showModal">新增</a-button>
+  <!--p防止与下面元素重叠 -->
+  <p>
+    <a-button type="primary" @click="showModal">新增</a-button>
+  </p>
+
+  <!--乘车人员展示-->
+  <a-table :dataSource="dataSource" :columns="columns" pagination="true"/>
+  <!-- 新增弹窗 -->
   <a-modal v-model:visible="visible" title="乘车人" @ok="handleOk"
            ok-text="确认" cancel-text="取消">
     <a-form
@@ -80,6 +87,38 @@ export default defineComponent({
       passenger,
       onFinish,
       onFinishFailed,
+      dataSource: [
+        {
+          key: '1',
+          name: '胡彦斌',
+          age: 32,
+          address: '西湖区湖底公园1号',
+        },
+        {
+          key: '2',
+          name: '胡彦祖',
+          age: 42,
+          address: '西湖区湖底公园1号',
+        },
+      ],
+
+      columns: [
+        {
+          title: '姓名',
+          dataIndex: 'name',
+          key: 'name',
+        },
+        {
+          title: '年龄',
+          dataIndex: 'age',
+          key: 'age',
+        },
+        {
+          title: '住址',
+          dataIndex: 'address',
+          key: 'address',
+        },
+      ],
 
 
     };
