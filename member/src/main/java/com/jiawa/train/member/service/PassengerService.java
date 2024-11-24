@@ -59,6 +59,9 @@ public class PassengerService {
     public PageResp<PassengerQueryResp> queryList(PassengerQueryReq req){
         // 创建乘客示例对象，用于构造查询条件
         PassengerExample passengerExample = new PassengerExample();
+        //根据id倒序排序
+        passengerExample.setOrderByClause("id desc");
+        // 创建查询条件对象
         PassengerExample.Criteria criteria = passengerExample.createCriteria();
         // 如果请求对象中的会员ID不为空，则添加会员ID作为查询条件
         if(ObjectUtil.isNotNull(req.getMemberId())){

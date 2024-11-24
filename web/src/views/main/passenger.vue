@@ -103,6 +103,10 @@ export default defineComponent({
         if(data.success) {
           notification.success({description:"乘车人基本信息保存成功"})
           visible.value = false;
+          handlerQuery({ //保存成功后刷新数据
+            page: pagination.current,
+            size: pagination.pageSize
+          });
         }else {
           notification.error({description: data.message})
         }
