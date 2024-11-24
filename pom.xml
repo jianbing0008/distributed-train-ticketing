@@ -91,6 +91,12 @@
                 <version>1.4.6</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>${freemarker.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
