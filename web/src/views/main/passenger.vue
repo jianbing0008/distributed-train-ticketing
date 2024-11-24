@@ -52,9 +52,7 @@
 
       <a-form-item label="类型">
         <a-select v-model:value="passenger.type" >
-          <a-select-option value="1">成人</a-select-option>
-          <a-select-option value="2">儿童</a-select-option>
-          <a-select-option value="3">学生</a-select-option>
+          <a-select-option v-for="item in PASSENGER_TYPE_ARRAY" :key="item.key" :value="item.key">{{item.value}}</a-select-option>
         </a-select>
       </a-form-item>
 
@@ -70,6 +68,9 @@ import {notification} from "ant-design-vue";
 
 export default defineComponent({
   setup() {
+
+    //将复选跟后端一样申请为枚举或常量
+    const PASSENGER_TYPE_ARRAY = [{key: "1",value: "成人1"},{key: "2",value: "儿童"},{key: "3",value: "学生"}]
 
     // 定义乘客信息的ref对象
     let passenger = ref({
@@ -123,6 +124,7 @@ export default defineComponent({
       //新增表单同时会同步前端的表单的数据，所以每次点击新增表单时清空passenger
       passenger.value = {};
       visible.value = true;
+      console.log("1111111111111"+passenger.value.id);
     };
 
     // 编辑乘客信息的方法
@@ -134,6 +136,8 @@ export default defineComponent({
 
     // 删除乘客信息的方法
     const onDelete = (record) => {
+      console.log("1111111111111"+passenger.value.id);
+      console.log("222222222222"+record.id);
       axios.delete("/member/passenger/delete/" + record.id).then(response => {
         let data = response.data;
         if (data.success) {
@@ -213,6 +217,7 @@ export default defineComponent({
     })
 
     return {
+      PASSENGER_TYPE_ARRAY,
       visible,
       onAdd,
       onEdit,
