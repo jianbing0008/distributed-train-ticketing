@@ -8,7 +8,11 @@
   </p>
 
   <!--乘车人员展示-->
-  <a-table :dataSource="passengers" :columns="columns" :pagination="pagination" @change="handleTableChange"/>
+  <a-table :dataSource="passengers"
+           :columns="columns"
+           :pagination="pagination"
+           @change="handleTableChange"
+           :loading="loading"/>
   <!-- 新增弹窗 -->
   <a-modal v-model:visible="visible" title="乘车人" @ok="handleOk"
            ok-text="确认" cancel-text="取消">
@@ -68,6 +72,8 @@ export default defineComponent({
       pageSize: 2,
     });
 
+    let loading = ref(false); //如果是ture的话就表示加载中
+
     const columns = [
       {
         title: '姓名',
@@ -111,12 +117,14 @@ export default defineComponent({
           size: pagination.pageSize
         };
       }
+      loading.value = true;//加载中，
       axios.get("/member/passenger/query-list",{
         params:{
           page: param.page,
           size: param.size
         }
       }).then((response) => {
+        loading.value = false;
         let data = response.data;
         if(data.success) {
           passengers.value = data.content.list;
@@ -153,6 +161,7 @@ export default defineComponent({
       handlerQuery,
       pagination,
       handleTableChange,
+      loading,
 
     };
   },
