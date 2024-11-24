@@ -5,7 +5,7 @@
   </p>
 
   <!--乘车人员展示-->
-  <a-table :dataSource="passengers" :columns="columns" :pagination="pagination"/>
+  <a-table :dataSource="passengers" :columns="columns" :pagination="pagination" @change="handleTableChange"/>
   <!-- 新增弹窗 -->
   <a-modal v-model:visible="visible" title="乘车人" @ok="handleOk"
            ok-text="确认" cancel-text="取消">
@@ -111,6 +111,8 @@ export default defineComponent({
         let data = response.data;
         if(data.success) {
           passengers.value = data.content.list;
+          // 设置分页控件的值
+          pagination.current = param.page;
           pagination.total = data.content.total;
           console.log("1111",passengers)
         }else{
@@ -118,11 +120,17 @@ export default defineComponent({
         }
       })
     }
+    const handleTableChange = (pagination) => {
+      handlerQuery({
+        page: pagination.current,
+        size: pagination.pageSize
+      });
+    };
 
     onMounted(() => {
       handlerQuery({
         page: 1,
-        size: 5
+        size: pagination.pageSize
       })
     })
 
@@ -135,6 +143,7 @@ export default defineComponent({
       columns,
       handlerQuery,
       pagination,
+      handleTableChange,
 
     };
   },
