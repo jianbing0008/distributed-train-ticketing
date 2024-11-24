@@ -40,15 +40,21 @@ public class PassengerService {
         DateTime now = DateTime.now();
         // 将请求对象转换为乘客对象，便于后续操作
         Passenger passenger = BeanUtil.copyProperties(req, Passenger.class);
-        // 设置乘客的会员ID，来源于登录会员上下文
-        passenger.setMemberId(LoginMemberContext.getId());
-        // 生成乘客的唯一ID
-        passenger.setId(SnowUtil.getSnowflakeNextId());
-        // 设置乘客信息的创建和更新时间为当前时间
-        passenger.setCreateTime(now);
-        passenger.setUpdateTime(now);
-        // 插入乘客信息到数据库
-        passengerMapper.insert(passenger);
+        if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增乘客
+            // 设置乘客的会员ID，来源于登录会员上下文
+            passenger.setMemberId(LoginMemberContext.getId());
+            // 生成乘客的唯一ID
+            passenger.setId(SnowUtil.getSnowflakeNextId());
+            // 设置乘客信息的创建和更新时间为当前时间
+            passenger.setCreateTime(now);
+            passenger.setUpdateTime(now);
+            // 插入乘客信息到数据库
+            passengerMapper.insert(passenger);
+        }else{  // 不为空则更新乘客信息
+            passenger.setUpdateTime(now);
+            passengerMapper.updateByPrimaryKey(passenger);
+        }
+
     }
 
     /**
