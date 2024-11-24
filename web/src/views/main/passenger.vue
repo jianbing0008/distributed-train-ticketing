@@ -16,6 +16,7 @@
 
     <!-- 增加编辑乘客按钮 -->
     <template #bodyCell="{ column, record }">
+
       <template v-if="column.dataIndex === 'operation'">
         <a-space>
           <a-popconfirm
@@ -27,6 +28,15 @@
           <a @click="onEdit(record)">编辑</a>
         </a-space>
       </template>
+
+      <template v-else-if="column.dataIndex === 'type'">
+        <span v-for="item in PASSENGER_TYPE_ARRAY" :key="item.key" >
+          <span v-if="item.key === record.type">
+            {{item.value}}
+          </span>
+        </span>
+      </template>
+
     </template>
 
   </a-table>
@@ -70,7 +80,7 @@ export default defineComponent({
   setup() {
 
     //将复选跟后端一样申请为枚举或常量
-    const PASSENGER_TYPE_ARRAY = [{key: "1",value: "成人1"},{key: "2",value: "儿童"},{key: "3",value: "学生"}]
+    const PASSENGER_TYPE_ARRAY = [{key: "1",value: "成人"},{key: "2",value: "儿童"},{key: "3",value: "学生"}]
 
     // 定义乘客信息的ref对象
     let passenger = ref({
