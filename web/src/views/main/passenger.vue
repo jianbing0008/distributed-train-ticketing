@@ -5,7 +5,7 @@
   </p>
 
   <!--乘车人员展示-->
-  <a-table :dataSource="dataSource" :columns="columns" pagination="true"/>
+  <a-table :dataSource="passengers" :columns="columns" pagination="true"/>
   <!-- 新增弹窗 -->
   <a-modal v-model:visible="visible" title="乘车人" @ok="handleOk"
            ok-text="确认" cancel-text="取消">
@@ -39,7 +39,8 @@
 </template>
 
 <script>
-import {defineComponent, ref, reactive} from "vue";
+//reactive数组重新赋值会失去响应式特性
+import {defineComponent, ref, reactive, onMounted} from 'vue';
 import axios from "axios";
 import {notification} from "ant-design-vue";
 
@@ -55,12 +56,25 @@ export default defineComponent({
       createTime: undefined,
       updateTime: undefined,
     });
-    const onFinish = values => {
-      console.log('Success:', values);
-    };
-    const onFinishFailed = errorInfo => {
-      console.log('Failed:', errorInfo);
-    };
+    //声明ref可以直接赋值  reactive要使用value
+    const passengers = ref([]);
+    const columns = [
+      {
+        title: '姓名',
+        dataIndex: 'name',
+        key: 'name',
+      },
+      {
+        title: '身份证',
+        dataIndex: 'idCard',
+        key: 'idCard',
+      },
+      {
+        title: '类型',
+        dataIndex: 'type',
+        key: 'type',
+      },
+    ]
 
     const visible = ref(false);
     const showModal = () => {
@@ -80,45 +94,38 @@ export default defineComponent({
       })
     };
 
+    const handlerQuery = param => {
+      axios.get("/member/passenger/query-list",{
+        params:{
+          page: param.page,
+          size: param.size
+        }
+      }).then((response) => {
+        let data = response.data;
+        if(data.success) {
+          passengers.value = data.content.list;
+          console.log("1111",passengers)
+        }else{
+          notification.error({description: data.message});
+        }
+      })
+    }
+
+    onMounted(() => {
+      handlerQuery({
+        page: 1,
+        size: 5
+      })
+    })
+
     return {
       visible,
       showModal,
       handleOk,
       passenger,
-      onFinish,
-      onFinishFailed,
-      dataSource: [
-        {
-          key: '1',
-          name: '胡彦斌',
-          age: 32,
-          address: '西湖区湖底公园1号',
-        },
-        {
-          key: '2',
-          name: '胡彦祖',
-          age: 42,
-          address: '西湖区湖底公园1号',
-        },
-      ],
-
-      columns: [
-        {
-          title: '姓名',
-          dataIndex: 'name',
-          key: 'name',
-        },
-        {
-          title: '年龄',
-          dataIndex: 'age',
-          key: 'age',
-        },
-        {
-          title: '住址',
-          dataIndex: 'address',
-          key: 'address',
-        },
-      ],
+      passengers,
+      columns,
+      handlerQuery,
 
 
     };
