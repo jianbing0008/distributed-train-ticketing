@@ -15,8 +15,11 @@ import java.io.IOException;
 import java.util.*;
 
 public class ServerGenerator {
+    static boolean readOnly = false;
+    static String vuePath = "web/src/views/main/";
     static String serverPath = "[module]/src/main/java/com/jiawa/train/[module]/";
     static String pomPath = "generator\\pom.xml";
+    static String module = "";
     static {
         new File(serverPath).mkdirs();
     }
@@ -25,7 +28,7 @@ public class ServerGenerator {
         // 获取mybatis-generator
         String generatorPath = getGeneratorPath();
         //比如 generator-config-member.xml，得到模块名module = member
-        String module = generatorPath.replace("src/main/resources/generator-config-","")
+        module = generatorPath.replace("src/main/resources/generator-config-","")
                                      .replace(".xml","");
 
         System.out.println("module: " + module);
@@ -78,13 +81,24 @@ public class ServerGenerator {
         param.put("tableNameCn", tableNameCn);
         param.put("fieldList", fieldList);
         param.put("typeSet", typeSet);
+        param.put("readOnly", readOnly);
         System.out.println("组装参数：" + param);
 
 //        gen(Domain, param,"service","service");
 //        gen(Domain, param,"controller", "controller");
 //        gen(Domain, param,"req","saveReq");
-        gen(Domain, param,"req","queryReq");
-        gen(Domain, param,"resp","queryResp");
+//        gen(Domain, param,"req","queryReq");
+//        gen(Domain, param,"resp","queryResp");
+        genVue(do_main, param);
+    }
+
+    private static void genVue(String do_main, Map<String, Object> param) throws IOException, TemplateException {
+        FreemarkerUtil.initConfig("vue.ftl");
+        new File(vuePath + module).mkdirs();
+        String fileName = vuePath +  "/" + do_main + ".vue";
+        System.out.println("开始生成：" + fileName);
+        FreemarkerUtil.generator(fileName, param);
+        System.out.println("生成成功");
     }
 
     /**
