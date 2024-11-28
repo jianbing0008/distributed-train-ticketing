@@ -5,7 +5,6 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jiawa.train.common.context.LoginMemberContext;
 import com.jiawa.train.common.resp.PageResp;
 import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.${module}.domain.${Domain};
@@ -42,7 +41,6 @@ public class ${Domain}Service {
         ${Domain} ${domain} = BeanUtil.copyProperties(req, ${Domain}.class);
         if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增${Domain}
             // 设置${Domain}的会员ID，来源于登录会员上下文
-            ${domain}.setMemberId(LoginMemberContext.getId());
             // 生成${Domain}的唯一ID
             ${domain}.setId(SnowUtil.getSnowflakeNextId());
             // 设置${Domain}信息的创建和更新时间为当前时间
@@ -69,10 +67,7 @@ public class ${Domain}Service {
         ${domain}Example.setOrderByClause("id desc");
         // 创建查询条件对象
         ${Domain}Example.Criteria criteria = ${domain}Example.createCriteria();
-        // 如果请求对象中的会员ID不为空，则添加会员ID作为查询条件
-        if(ObjectUtil.isNotNull(req.getMemberId())){
-            criteria.andMemberIdEqualTo(req.getMemberId());
-        }
+
 
         // 记录查询日志
         log.info("查询页码：{}", req.getPage());
