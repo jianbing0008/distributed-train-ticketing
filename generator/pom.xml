@@ -18,7 +18,7 @@
     </properties>
 
     <dependencies>
-        <!-- 集成mysql连接 -->
+        <!-- 集成mysql连接 这个是jdbc获取数据库字段用的，下面connector是配置文件做连接的-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -45,6 +45,11 @@
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
             <version>1.2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
         </dependency>
     </dependencies>
 
