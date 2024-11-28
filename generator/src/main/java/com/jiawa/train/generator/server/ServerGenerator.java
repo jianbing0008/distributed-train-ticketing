@@ -1,6 +1,7 @@
 package com.jiawa.train.generator.server;
 
 
+import com.jiawa.train.generator.util.FreemarkerUtil;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
@@ -11,18 +12,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServerGenerator {
-    static String toPath = "generator\\src\\main\\java\\com\\jiawa\\train\\generator\\test\\";
+    static String servicePath = "[module]/src/main/java/com/jiawa/train/[module]/service/";
     static String pomPath = "generator\\pom.xml";
     static {
-        new File(toPath).mkdirs();
+        new File(servicePath).mkdirs();
     }
 
     public static void main(String[] args) throws Exception{
-//        FreemarkerUtil.initConfig("test.ftl");
-//        HashMap<String, Object> param = new HashMap<>();
-//        param.put("domain","Test");
-//        FreemarkerUtil.generator(toPath + "Test.java",param);
+        // 获取mybatis-generator
         String generatorPath = getGeneratorPath();
+        //比如 generator-config-member.xml，得到模块名module = member
+        String module = generatorPath.replace("src/main/resources/generator-config-","")
+                                     .replace(".xml","");
+
+        System.out.println("module: " + module);
+        servicePath = servicePath.replace("[module]",module);
+        System.out.println("servicePath: " + servicePath);
 
         // 读取table节点
         Document document = new SAXReader().read("generator/" + generatorPath);
@@ -32,6 +37,27 @@ public class ServerGenerator {
         Node tableName = table.selectSingleNode("@tableName");
         Node domainObjectName = table.selectSingleNode("@domainObjectName");
         System.out.println(tableName.getText() + "/" + domainObjectName.getText());
+
+        // 示例：表名 jian_test
+        // Domain = JianTest
+        String Domain = domainObjectName.getText();
+        // domain = jianTest
+        String domain = Domain.substring(0, 1).toLowerCase() + Domain.substring(1);
+        // do_main = jian-test  controller层url用到
+        String do_main = tableName.getText().replaceAll("_", "-");
+
+
+        FreemarkerUtil.initConfig("service.ftl");
+        // 组装参数
+        Map<String, Object> param = new HashMap<>();
+        param.put("module", module);
+        param.put("Domain", Domain);
+        param.put("domain", domain);
+        param.put("do_main", do_main);
+        System.out.println("组装参数：" + param);
+
+        FreemarkerUtil.initConfig("service.ftl");
+        FreemarkerUtil.generator(servicePath + Domain + "Service.java",param);
     }
 
     private static String getGeneratorPath() throws DocumentException {
