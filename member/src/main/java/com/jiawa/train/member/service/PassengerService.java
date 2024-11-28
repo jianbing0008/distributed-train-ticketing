@@ -23,7 +23,7 @@ import java.util.List;
 @Service
 @Slf4j
 /**
- * 乘客服务类，负责处理与乘客相关的业务逻辑
+ * Passenger服务类，负责处理与Passenger相关的业务逻辑
  */
 public class PassengerService {
 
@@ -31,26 +31,26 @@ public class PassengerService {
     private PassengerMapper passengerMapper;
 
     /**
-     * 保存乘客信息
+     * 保存Passenger信息
      *
-     * @param req 乘客保存请求对象，包含乘客的基本信息
+     * @param req Passenger保存请求对象，包含Passenger的基本信息
      */
     public void save(PassengerSaveReq req){
-        // 获取当前时间，用于记录乘客信息的创建和更新时间
+        // 获取当前时间，用于记录Passenger信息的创建和更新时间
         DateTime now = DateTime.now();
-        // 将请求对象转换为乘客对象，便于后续操作
+        // 将请求对象转换为Passenger对象，便于后续操作
         Passenger passenger = BeanUtil.copyProperties(req, Passenger.class);
-        if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增乘客
-            // 设置乘客的会员ID，来源于登录会员上下文
+        if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增Passenger
+            // 设置Passenger的会员ID，来源于登录会员上下文
             passenger.setMemberId(LoginMemberContext.getId());
-            // 生成乘客的唯一ID
+            // 生成Passenger的唯一ID
             passenger.setId(SnowUtil.getSnowflakeNextId());
-            // 设置乘客信息的创建和更新时间为当前时间
+            // 设置Passenger信息的创建和更新时间为当前时间
             passenger.setCreateTime(now);
             passenger.setUpdateTime(now);
-            // 插入乘客信息到数据库
+            // 插入Passenger信息到数据库
             passengerMapper.insert(passenger);
-        }else{  // 不为空则更新乘客信息
+        }else{  // 不为空则更新Passenger信息
             passenger.setUpdateTime(now);
             passengerMapper.updateByPrimaryKey(passenger);
         }
@@ -58,12 +58,12 @@ public class PassengerService {
     }
 
     /**
-     * 查询乘客列表
+     * 查询Passenger列表
      *
-     * @param req 乘客查询请求对象，可能包含乘客的会员ID等查询条件
+     * @param req Passenger查询请求对象，可能包含Passenger的会员ID等查询条件
      */
     public PageResp<PassengerQueryResp> queryList(PassengerQueryReq req){
-        // 创建乘客示例对象，用于构造查询条件
+        // 创建Passenger示例对象，用于构造查询条件
         PassengerExample passengerExample = new PassengerExample();
         //根据id倒序排序
         passengerExample.setOrderByClause("id desc");
@@ -79,7 +79,7 @@ public class PassengerService {
         log.info("每页条数：{}", req.getSize());
         // 启用分页查询
         PageHelper.startPage(req.getPage(),req.getSize());
-        // 根据构造的查询条件，从数据库中选择符合条件的乘客信息
+        // 根据构造的查询条件，从数据库中选择符合条件的Passenger信息
         List<Passenger> passengerList = passengerMapper.selectByExample(passengerExample);
 
         // 创建PageInfo对象，用于获取分页信息
