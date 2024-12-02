@@ -1,4 +1,4 @@
-package com.jiawa.train.${module}.controller;
+package com.jiawa.train.${module}.controller.admin;
 
 import com.jiawa.train.common.context.LoginMemberContext;
 import com.jiawa.train.common.resp.CommonResp;
@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/${do_main}")
-public class ${Domain}Controller {
+@RequestMapping("/admin/${do_main}")
+public class ${Domain}AdminController {
     @Autowired
     private ${Domain}Service ${domain}Service;
 
