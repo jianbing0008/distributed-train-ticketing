@@ -10,6 +10,11 @@ spring:
           predicates:
             - Path=/member/**
           uri: http://127.0.0.1:8001
+        - id: business
+          predicates:
+            - Path=/business/**
+          uri: http://127.0.0.1:8002
+
       # 允许请求来源（老版本叫allowedOrigin）        跨域请求问题
       globalcors:
         cors-configurations:
