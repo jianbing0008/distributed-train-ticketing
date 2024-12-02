@@ -2,11 +2,12 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import Antd, {notification} from 'ant-design-vue';
+import Antd from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
 import * as Icons from'@ant-design/icons-vue';
 import axios from 'axios';
 import './assets/js/enums'
+
 
 const app = createApp(App)
 app.use(Antd).use(store).use(router).mount('#app')
@@ -24,11 +25,6 @@ for (const i in icons) {
 axios.interceptors.request.use(function (config) {
   // 在请求发送之前做些什么
   console.log('请求参数：', config);
-  const _token = store.state.member.token;
-  if (_token) {
-    config.headers.token = _token;
-    console.log('请求headers增加token：', _token);
-  }
   return config;
 }, error => {
   // 对请求错误做些什么
@@ -42,15 +38,7 @@ axios.interceptors.response.use(function (response) {
 }, error => {
   // 对响应错误做点什么
   console.log('返回错误：', error);
-  const _response = error.response;
-  const status = _response.status;
-  if (status === 401) {
-    // 判断状态码是401 跳转到登录页
-    console.log("未登录或登录超时，跳到登录页");
-    store.commit('setMember', {});
-    notification.error({description: '登录过期，请重新登录！'});
-    router.push('/login');
-  }
+
   return Promise.reject(error);
 });
 axios.defaults.baseURL = process.env.VUE_APP_SERVER;

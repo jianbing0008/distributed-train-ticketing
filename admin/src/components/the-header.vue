@@ -1,12 +1,14 @@
 <template>
   <a-layout-header class="header">
-    <div class="logo" />
-    <div style="float: right; color: white;">
-      欢迎您访问煎饼制作的铁路12306：{{member.mobile}} &nbsp;&nbsp;
-      <router-link to="/login">
-        退出登录
+    <div class="logo">
+      <router-link to="/welcome" style="color: white; font-size: 20px">
+        12306控台
       </router-link>
     </div>
+    <div style="float: right; color: white;">
+      欢迎使用管理控台
+    </div>
+
     <a-menu
         v-model:selectedKeys="selectedKeys"
         theme="dark"
@@ -18,9 +20,9 @@
           <coffee-outlined /> &nbsp; 欢迎
         </router-link>
       </a-menu-item>
-      <a-menu-item key="/passenger">
-        <router-link to="/passenger">
-          <user-outlined /> &nbsp; 乘车人管理
+      <a-menu-item key="/about">
+        <router-link to="/about">
+          <user-outlined /> &nbsp;  关于
         </router-link>
       </a-menu-item>
     </a-menu>
@@ -29,14 +31,12 @@
 
 <script>
 import {defineComponent, ref, watch,} from 'vue';
-import store from "@/store";
 import router from "@/router";
 
 
 export default defineComponent({
   name: "the-header-view",
   setup() {
-    let member = store.state.member;
     const selectedKeys = ref([]);
 
     watch(() => router.currentRoute.value.path, (newVal) => {
@@ -47,7 +47,6 @@ export default defineComponent({
 
     return {
       selectedKeys,
-      member
 
     };
   },
@@ -56,5 +55,11 @@ export default defineComponent({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+  .logo {
+    float: left;
+    height: 31px;
+    width: 150px;
+    color: white;
+    font-size: 20px;
+  }
 </style>
