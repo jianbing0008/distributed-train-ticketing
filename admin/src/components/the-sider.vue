@@ -11,30 +11,43 @@
           <coffee-outlined /> &nbsp; 欢迎
         </router-link>
       </a-menu-item>
+
       <a-menu-item key="/about">
         <router-link to="/about">
           <user-outlined /> &nbsp; 关于
         </router-link>
       </a-menu-item>
+
       <a-menu-item key="/station">
         <router-link to="/station">
           <user-outlined /> &nbsp; 车站管理
         </router-link>
       </a-menu-item>
+
       <a-menu-item key="/train">
         <router-link to="/train">
           <user-outlined /> &nbsp; 火车管理
         </router-link>
       </a-menu-item>
+
       <a-menu-item key="/train-station">
         <router-link to="/train-station">
           <user-outlined /> &nbsp; 火车车站
         </router-link>
-      </a-menu-item><a-menu-item key="/train-carriage">
+      </a-menu-item>
+
+      <a-menu-item key="/train-carriage">
         <router-link to="/train-carriage">
           <user-outlined /> &nbsp; 火车车厢
         </router-link>
       </a-menu-item>
+
+      <a-menu-item key="/train-seat">
+        <router-link to="/train-seat">
+          <user-outlined /> &nbsp; 座位
+        </router-link>
+      </a-menu-item>
+
     </a-menu>
   </a-layout-sider>
 </template>
