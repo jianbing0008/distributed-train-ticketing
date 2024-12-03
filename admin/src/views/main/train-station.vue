@@ -218,11 +218,24 @@ export default defineComponent({
       });
     };
 
-    onMounted(() => {
+    const queryTrainCode = () => {
+      axios.get("/business/admin/train/query-all").then((response) => {
+        let data = response.data;
+        if (data.success) {
+          console.log(data.content);
+        } else {
+          notification.error({description: data.message});
+        }
+      });
+    };
+
+    onMounted(() => {// 页面加载时执行
       handleQuery({
         page: 1,
         size: pagination.value.pageSize
       });
+
+      queryTrainCode();
     });
 
     return {
