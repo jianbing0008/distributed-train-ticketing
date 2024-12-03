@@ -100,8 +100,8 @@ public class TrainService {
     public List<TrainQueryResp> queryAll(){
         // 创建Train示例对象，用于构造查询条件
         TrainExample trainExample = new TrainExample();
-        //根据code(车次编号)倒序排序
-        trainExample.setOrderByClause("id desc");
+        //根据code(车次编号)排序
+        trainExample.setOrderByClause("code asc");
         // 根据构造的查询条件，从数据库中选择符合条件的Train信息
         List<Train> trainList = trainMapper.selectByExample(trainExample);
         // 将查询结果列表转换为目标响应对象列表
