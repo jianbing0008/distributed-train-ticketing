@@ -1,7 +1,7 @@
 <template>
   <a-select v-model:value="name" show-search allow-clear
             :filter-option="filterNameOption" placeholder="请选择车站"
-            @change="onChange" :style="'width: ' + _width">
+            @change="onChange" :style="'width: ' + localWidth">
 
     <a-select-option v-for="item in stations" :key="item.name"
                      :value="item.name" :label="item.name + item.namePinyin + item.namePy">
@@ -24,9 +24,9 @@ export default defineComponent({
     const name = ref();
     const stations = ref([]);
 
-    const _width = ref(props.width);
+    const localWidth = ref(props.width);
     if(Tool.isEmpty(props.width)) {
-      _width.value = "100%";
+      localWidth.value = "100%";
     }
 
     //利用watch，动态获取父组件的值，如果放在onMounted或其他方法只会执行一次
@@ -76,7 +76,7 @@ export default defineComponent({
       stations,
       filterNameOption,
       onChange,
-      _width,
+      localWidth,
       queryAllTrain,
     };
   },
