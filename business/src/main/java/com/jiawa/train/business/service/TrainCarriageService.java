@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jiawa.train.business.enums.SeatColEnum;
 import com.jiawa.train.common.resp.PageResp;
 import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.business.domain.TrainCarriage;
@@ -38,6 +39,13 @@ public class TrainCarriageService {
     public void save(TrainCarriageSaveReq req){
         // 获取当前时间，用于记录TrainCarriage信息的创建和更新时间
         DateTime now = DateTime.now();
+
+        //自动计算出列数和总座位数
+        List<SeatColEnum> seatColEnums = SeatColEnum.getColsByType(req.getSeatType());
+        req.setColCount(seatColEnums.size());
+        req.setSeatCount(seatColEnums.size() * req.getRowCount());
+
+
         // 将请求对象转换为TrainCarriage对象，便于后续操作
         TrainCarriage trainCarriage = BeanUtil.copyProperties(req, TrainCarriage.class);
         if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增TrainCarriage
