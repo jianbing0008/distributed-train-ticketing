@@ -29,6 +29,7 @@ public class TrainCarriageService {
     @Autowired
     private TrainCarriageMapper trainCarriageMapper;
 
+
     /**
      * 保存TrainCarriage信息
      *
@@ -98,5 +99,13 @@ public class TrainCarriageService {
 
     public void delete(Long id) {
         trainCarriageMapper.deleteByPrimaryKey(id);
+    }
+
+    public List<TrainCarriage> selectByTrainCode(String trainCode) {
+        TrainCarriageExample trainCarriageExample = new TrainCarriageExample();
+        TrainCarriageExample.Criteria criteria = trainCarriageExample.createCriteria();
+        trainCarriageExample.setOrderByClause("`index` asc");
+        criteria.andTrainCodeEqualTo(trainCode);
+        return trainCarriageMapper.selectByExample(trainCarriageExample);
     }
 }
