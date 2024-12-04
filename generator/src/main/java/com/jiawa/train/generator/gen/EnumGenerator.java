@@ -45,15 +45,15 @@ public class EnumGenerator {
         Object[] objects = clazz.getEnumConstants();
         Method name = clazz.getMethod("name");
 
-        // 排除枚举属性和$VALUES，只获取code desc等
-        List<Field> targetFields = new ArrayList<>();
-        Field[] fields = clazz.getDeclaredFields();
-        for (Field field : fields) {
-            if (!Modifier.isPrivate(field.getModifiers()) || "$VALUES".equals(field.getName())) {
-                continue;
+            ///////// -----------排除枚举属性和$VALUES，只获取code desc等---------
+            List<Field> targetFields = new ArrayList<>();
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field field : fields) {
+                if (!Modifier.isPrivate(field.getModifiers()) || "$VALUES".equals(field.getName())) {
+                    continue;
+                }
+                targetFields.add(field);
             }
-            targetFields.add(field);
-        }
 
         // 生成对象
         bufferObject.append(enumConst).append("={");
@@ -61,7 +61,7 @@ public class EnumGenerator {
             Object obj = objects[i];
             bufferObject.append(name.invoke(obj)).append(":");
 
-            // 将一个枚举值转成JSON对象字符串
+            // //将一个枚举值转成JSON对象字符串
             formatJsonObj(bufferObject, targetFields, clazz, obj);
 
             if (i < objects.length - 1) {
@@ -75,7 +75,7 @@ public class EnumGenerator {
         for (int i = 0; i < objects.length; i++) {
             Object obj = objects[i];
 
-            // 将一个枚举值转成JSON对象字符串
+            //// 将一个枚举值转成JSON对象字符串
             formatJsonObj(bufferArray, targetFields, clazz, obj);
 
             if (i < objects.length - 1) {
@@ -85,7 +85,7 @@ public class EnumGenerator {
         bufferArray.append("];\r\n");
     }
 
-    /**
+    /*********************************
      * 将一个枚举值转成JSON对象字符串
      * 比如：SeatColEnum.YDZ_A("A", "A", "1")
      * 转成：{code:"A",desc:"A",type:"1"}
