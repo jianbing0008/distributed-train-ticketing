@@ -64,10 +64,13 @@ public class TrainSeatService {
         // 创建TrainSeat示例对象，用于构造查询条件
         TrainSeatExample trainSeatExample = new TrainSeatExample();
         //根据id倒序排序
-        trainSeatExample.setOrderByClause("id desc");
+        trainSeatExample.setOrderByClause("train_code asc, carriage_index asc, carriage_seat_index asc");
         // 创建查询条件对象
         TrainSeatExample.Criteria criteria = trainSeatExample.createCriteria();
 
+        if(ObjectUtil.isNotEmpty(req.getTrainCode())){
+            criteria.andTrainCodeEqualTo(req.getTrainCode());
+        }
 
         // 记录查询日志
         log.info("查询页码：{}", req.getPage());
