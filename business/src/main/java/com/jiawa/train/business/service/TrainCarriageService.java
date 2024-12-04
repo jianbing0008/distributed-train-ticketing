@@ -64,10 +64,13 @@ public class TrainCarriageService {
         // 创建TrainCarriage示例对象，用于构造查询条件
         TrainCarriageExample trainCarriageExample = new TrainCarriageExample();
         //根据id倒序排序
-        trainCarriageExample.setOrderByClause("id desc");
+        trainCarriageExample.setOrderByClause("train_code asc, `index` asc");
         // 创建查询条件对象
         TrainCarriageExample.Criteria criteria = trainCarriageExample.createCriteria();
 
+        if(ObjectUtil.isNotEmpty(req.getTrainCode())){
+            criteria.andTrainCodeEqualTo(req.getTrainCode());
+        }
 
         // 记录查询日志
         log.info("查询页码：{}", req.getPage());
