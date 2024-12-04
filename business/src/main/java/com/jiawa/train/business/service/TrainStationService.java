@@ -64,10 +64,16 @@ public class TrainStationService {
         // 创建TrainStation示例对象，用于构造查询条件
         TrainStationExample trainStationExample = new TrainStationExample();
         //根据id倒序排序
-        trainStationExample.setOrderByClause("id desc");
+        trainStationExample.setOrderByClause("train_code asc, `index` asc");
         // 创建查询条件对象
         TrainStationExample.Criteria criteria = trainStationExample.createCriteria();
 
+
+        // 根据req对象中的trainCode属性值来决定是否添加查询条件
+        if(ObjectUtil.isNotNull(req.getTrainCode())){
+            // 如果trainCode不为空，则添加查询条件，限定查询结果的trainCode必须与req对象中的trainCode相同
+            criteria.andTrainCodeEqualTo(req.getTrainCode());
+        }
 
         // 记录查询日志
         log.info("查询页码：{}", req.getPage());
