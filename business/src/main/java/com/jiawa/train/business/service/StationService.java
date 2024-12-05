@@ -1,6 +1,7 @@
 package com.jiawa.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
@@ -11,6 +12,8 @@ import com.jiawa.train.business.mapper.StationMapper;
 import com.jiawa.train.business.req.StationQueryReq;
 import com.jiawa.train.business.req.StationSaveReq;
 import com.jiawa.train.business.resp.StationQueryResp;
+import com.jiawa.train.common.exception.BusinessException;
+import com.jiawa.train.common.exception.BusinessExceptionEnum;
 import com.jiawa.train.common.resp.PageResp;
 import com.jiawa.train.common.util.SnowUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +43,13 @@ public class StationService {
         // 将请求对象转换为Station对象，便于后续操作
         Station station = BeanUtil.copyProperties(req, Station.class);
         if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增Station
+            // 保存之前，先校验唯一键是否存在
+            StationExample stationExample = new StationExample();
+            stationExample.createCriteria().andNameEqualTo(station.getName());
+            List<Station> stationList = stationMapper.selectByExample(stationExample);
+            if(CollUtil.isNotEmpty(stationList)){
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_STATION_NAME_UNIQUE_ERROR);
+            }
             // 设置Station的会员ID，来源于登录会员上下文
             // 生成Station的唯一ID
             station.setId(SnowUtil.getSnowflakeNextId());

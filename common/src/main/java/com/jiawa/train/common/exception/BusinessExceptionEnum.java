@@ -3,9 +3,12 @@ package com.jiawa.train.common.exception;
 //注意不能在枚举类上使用lombok的Data注解来自动生成getter/setter
 public enum BusinessExceptionEnum {
 
-    MEMBER_MOBILE_EXIST("手机号已注册"),
+    MEMBER_MOBILE_EXIST("手机号已注册"),  //注意枚举常量是以逗号为分隔的
     MEMBER_MOBILE_NOT_EXIST("请先获取短信验证码"),
-    MEMBER_MOBILE_CODE_ERROR("短信验证码错误");
+    MEMBER_MOBILE_CODE_ERROR("短信验证码错误"),
+
+    BUSINESS_STATION_NAME_UNIQUE_ERROR("车站名以存在");
+
 
     private String desc;
 
