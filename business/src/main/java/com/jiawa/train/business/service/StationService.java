@@ -44,10 +44,8 @@ public class StationService {
         Station station = BeanUtil.copyProperties(req, Station.class);
         if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增Station
             // 保存之前，先校验唯一键是否存在
-            StationExample stationExample = new StationExample();
-            stationExample.createCriteria().andNameEqualTo(station.getName());
-            List<Station> stationList = stationMapper.selectByExample(stationExample);
-            if(CollUtil.isNotEmpty(stationList)){
+            Station stationDB = selectByUnique(req.getName());
+            if(ObjectUtil.isNotEmpty(stationDB)){
                 throw new BusinessException(BusinessExceptionEnum.BUSINESS_STATION_NAME_UNIQUE_ERROR);
             }
             // 设置Station的会员ID，来源于登录会员上下文
@@ -63,6 +61,16 @@ public class StationService {
             stationMapper.updateByPrimaryKey(station);
         }
 
+    }
+
+    private Station selectByUnique(String name) {
+        StationExample stationExample = new StationExample();
+        stationExample.createCriteria().andNameEqualTo(name);
+        List<Station> list = stationMapper.selectByExample(stationExample);
+        if(CollUtil.isNotEmpty(list)){
+            return list.get(0);
+        }
+        return null;
     }
 
     /**
