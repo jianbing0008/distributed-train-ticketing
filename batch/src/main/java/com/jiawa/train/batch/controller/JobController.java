@@ -189,4 +189,20 @@ public class JobController {
         return commonResp;
     }
 
+    /**
+     * 手工调用定时任务
+     */
+    @RequestMapping(value = "/run")
+    public CommonResp<Object> run(@RequestBody CronJobReq cronJobReq) {
+        String jobClassName = cronJobReq.getName();
+        String jobGroupName = cronJobReq.getGroup();
+        LOG.info("手动执行一次定时任务开始：{}，{}", jobClassName, jobGroupName);
+        try {
+            schedulerFactoryBean.getScheduler().triggerJob(JobKey.jobKey(jobClassName, jobGroupName));
+        } catch (Exception e) {
+            LOG.error("手动执行一次定时任务失败:" + e);
+        }
+        return new CommonResp();
+    }
+
 }
