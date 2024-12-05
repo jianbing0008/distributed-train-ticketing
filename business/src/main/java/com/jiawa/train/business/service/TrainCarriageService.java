@@ -1,19 +1,22 @@
 package com.jiawa.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jiawa.train.business.enums.SeatColEnum;
-import com.jiawa.train.common.resp.PageResp;
-import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.business.domain.TrainCarriage;
 import com.jiawa.train.business.domain.TrainCarriageExample;
+import com.jiawa.train.business.enums.SeatColEnum;
 import com.jiawa.train.business.mapper.TrainCarriageMapper;
 import com.jiawa.train.business.req.TrainCarriageQueryReq;
 import com.jiawa.train.business.req.TrainCarriageSaveReq;
 import com.jiawa.train.business.resp.TrainCarriageQueryResp;
+import com.jiawa.train.common.exception.BusinessException;
+import com.jiawa.train.common.exception.BusinessExceptionEnum;
+import com.jiawa.train.common.resp.PageResp;
+import com.jiawa.train.common.util.SnowUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,6 +52,11 @@ public class TrainCarriageService {
         // 将请求对象转换为TrainCarriage对象，便于后续操作
         TrainCarriage trainCarriage = BeanUtil.copyProperties(req, TrainCarriage.class);
         if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增TrainCarriage
+            // 保存之前，先校验唯一键是否存在
+            TrainCarriage trainCarriageDB = selectByUnique(req.getTrainCode(), req.getIndex());
+            if(ObjectUtil.isNotEmpty(trainCarriageDB)){
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_TRAIN_CARRIAGE_INDEX_UNIQUE_ERROR);
+            }
             // 设置TrainCarriage的会员ID，来源于登录会员上下文
             // 生成TrainCarriage的唯一ID
             trainCarriage.setId(SnowUtil.getSnowflakeNextId());
@@ -62,6 +70,16 @@ public class TrainCarriageService {
             trainCarriageMapper.updateByPrimaryKey(trainCarriage);
         }
 
+    }
+
+    private TrainCarriage selectByUnique(String trainCode, Integer index) {
+        TrainCarriageExample trainCarriageExample = new TrainCarriageExample();
+        trainCarriageExample.createCriteria().andTrainCodeEqualTo(trainCode).andIndexEqualTo(index);
+        List<TrainCarriage> list = trainCarriageMapper.selectByExample(trainCarriageExample);
+        if(CollUtil.isNotEmpty(list)){
+            return list.get(0);
+        }
+        return null;
     }
 
     /**
@@ -116,4 +134,5 @@ public class TrainCarriageService {
         criteria.andTrainCodeEqualTo(trainCode);
         return trainCarriageMapper.selectByExample(trainCarriageExample);
     }
+
 }

@@ -1,18 +1,21 @@
 package com.jiawa.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jiawa.train.common.resp.PageResp;
-import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.business.domain.TrainStation;
 import com.jiawa.train.business.domain.TrainStationExample;
 import com.jiawa.train.business.mapper.TrainStationMapper;
 import com.jiawa.train.business.req.TrainStationQueryReq;
 import com.jiawa.train.business.req.TrainStationSaveReq;
 import com.jiawa.train.business.resp.TrainStationQueryResp;
+import com.jiawa.train.common.exception.BusinessException;
+import com.jiawa.train.common.exception.BusinessExceptionEnum;
+import com.jiawa.train.common.resp.PageResp;
+import com.jiawa.train.common.util.SnowUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +43,16 @@ public class TrainStationService {
         // 将请求对象转换为TrainStation对象，便于后续操作
         TrainStation trainStation = BeanUtil.copyProperties(req, TrainStation.class);
         if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增TrainStation
+            // 保存之前，先校验唯一键是否存在
+            TrainStation trainStationDB = selectByUnique(req.getTrainCode(), req.getIndex());
+            if(ObjectUtil.isNotEmpty(trainStationDB) ){
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_TRAIN_STATION_INDEX_UNIQUE_ERROR);
+            }
+            trainStationDB = selectByUnique(req.getTrainCode(), req.getName());
+            if(ObjectUtil.isNotEmpty(trainStationDB)){
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_TRAIN_STATION_NAME_UNIQUE_ERROR);
+            }
+
             // 设置TrainStation的会员ID，来源于登录会员上下文
             // 生成TrainStation的唯一ID
             trainStation.setId(SnowUtil.getSnowflakeNextId());
@@ -53,6 +66,24 @@ public class TrainStationService {
             trainStationMapper.updateByPrimaryKey(trainStation);
         }
 
+    }
+    private TrainStation selectByUnique(String trainCode, Integer index) {
+        TrainStationExample trainStationExample = new TrainStationExample();
+        trainStationExample.createCriteria().andTrainCodeEqualTo(trainCode).andIndexEqualTo(index);
+        List<TrainStation> list = trainStationMapper.selectByExample(trainStationExample);
+        if(CollUtil.isNotEmpty(list)){
+            return list.get(0);
+        }
+        return null;
+    }
+    private TrainStation selectByUnique(String trainCode, String name) {
+        TrainStationExample trainStationExample = new TrainStationExample();
+        trainStationExample.createCriteria().andTrainCodeEqualTo(trainCode).andNameEqualTo(name);
+        List<TrainStation> list = trainStationMapper.selectByExample(trainStationExample);
+        if(CollUtil.isNotEmpty(list)){
+            return list.get(0);
+        }
+        return null;
     }
 
     /**
@@ -102,4 +133,6 @@ public class TrainStationService {
     public void delete(Long id) {
         trainStationMapper.deleteByPrimaryKey(id);
     }
+
+
 }

@@ -1,18 +1,21 @@
 package com.jiawa.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jiawa.train.common.resp.PageResp;
-import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.business.domain.Train;
 import com.jiawa.train.business.domain.TrainExample;
 import com.jiawa.train.business.mapper.TrainMapper;
 import com.jiawa.train.business.req.TrainQueryReq;
 import com.jiawa.train.business.req.TrainSaveReq;
 import com.jiawa.train.business.resp.TrainQueryResp;
+import com.jiawa.train.common.exception.BusinessException;
+import com.jiawa.train.common.exception.BusinessExceptionEnum;
+import com.jiawa.train.common.resp.PageResp;
+import com.jiawa.train.common.util.SnowUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +43,11 @@ public class TrainService {
         // 将请求对象转换为Train对象，便于后续操作
         Train train = BeanUtil.copyProperties(req, Train.class);
         if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增Train
+            // 保存之前，先校验唯一键是否存在
+            Train trainDB = selectByUnique(req.getCode());
+            if(ObjectUtil.isNotEmpty(trainDB)){
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_TRAIN_CODE_UNIQUE_ERROR);
+            }
             // 设置Train的会员ID，来源于登录会员上下文
             // 生成Train的唯一ID
             train.setId(SnowUtil.getSnowflakeNextId());
@@ -53,6 +61,16 @@ public class TrainService {
             trainMapper.updateByPrimaryKey(train);
         }
 
+    }
+
+    private Train selectByUnique(String code) {
+        TrainExample trainExample = new TrainExample();
+        trainExample.createCriteria().andCodeEqualTo(code);
+        List<Train> list = trainMapper.selectByExample(trainExample);
+        if(CollUtil.isNotEmpty(list)){
+            return list.get(0);
+        }
+        return null;
     }
 
     /**
@@ -107,4 +125,6 @@ public class TrainService {
         // 将查询结果列表转换为目标响应对象列表
         return BeanUtil.copyToList(trainList, TrainQueryResp.class);
     }
+
+
 }
