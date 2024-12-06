@@ -2,17 +2,19 @@ package com.jiawa.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jiawa.train.common.resp.PageResp;
-import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.business.domain.DailyTrainCarriage;
 import com.jiawa.train.business.domain.DailyTrainCarriageExample;
+import com.jiawa.train.business.enums.SeatColEnum;
 import com.jiawa.train.business.mapper.DailyTrainCarriageMapper;
 import com.jiawa.train.business.req.DailyTrainCarriageQueryReq;
 import com.jiawa.train.business.req.DailyTrainCarriageSaveReq;
 import com.jiawa.train.business.resp.DailyTrainCarriageQueryResp;
+import com.jiawa.train.common.resp.PageResp;
+import com.jiawa.train.common.util.SnowUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,12 @@ public class DailyTrainCarriageService {
     public void save(DailyTrainCarriageSaveReq req){
         // 获取当前时间，用于记录DailyTrainCarriage信息的创建和更新时间
         DateTime now = DateTime.now();
+
+        //自动计算出列数和总座位数
+        List<SeatColEnum> seatColEnums = SeatColEnum.getColsByType(req.getSeatType());
+        req.setColCount(seatColEnums.size());
+        req.setSeatCount(seatColEnums.size() * req.getRowCount());
+
         // 将请求对象转换为DailyTrainCarriage对象，便于后续操作
         DailyTrainCarriage dailyTrainCarriage = BeanUtil.copyProperties(req, DailyTrainCarriage.class);
         if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增DailyTrainCarriage
@@ -64,9 +72,16 @@ public class DailyTrainCarriageService {
         // 创建DailyTrainCarriage示例对象，用于构造查询条件
         DailyTrainCarriageExample dailyTrainCarriageExample = new DailyTrainCarriageExample();
         //根据id倒序排序
-        dailyTrainCarriageExample.setOrderByClause("id desc");
+        dailyTrainCarriageExample.setOrderByClause("date desc, train_code asc, `index` asc");
         // 创建查询条件对象
         DailyTrainCarriageExample.Criteria criteria = dailyTrainCarriageExample.createCriteria();
+
+        if (ObjUtil.isNotNull(req.getDate())) {
+            criteria.andDateEqualTo(req.getDate());
+        }
+        if (ObjUtil.isNotEmpty(req.getTrainCode())) {
+            criteria.andTrainCodeEqualTo(req.getTrainCode());
+        }
 
 
         // 记录查询日志
