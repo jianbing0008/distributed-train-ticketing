@@ -64,9 +64,17 @@ public class DailyTrainStationService {
         // 创建DailyTrainStation示例对象，用于构造查询条件
         DailyTrainStationExample dailyTrainStationExample = new DailyTrainStationExample();
         //根据id倒序排序
-        dailyTrainStationExample.setOrderByClause("id desc");
+        dailyTrainStationExample.setOrderByClause("date desc, train_code asc, `index asc`");
         // 创建查询条件对象
         DailyTrainStationExample.Criteria criteria = dailyTrainStationExample.createCriteria();
+
+        if(ObjectUtil.isNotNull(req.getDate())){
+            criteria.andDateEqualTo(req.getDate());
+        }
+
+        if(ObjectUtil.isNotEmpty(req.getTrainCode())){
+            criteria.andTrainCodeEqualTo(req.getTrainCode());
+        }
 
 
         // 记录查询日志

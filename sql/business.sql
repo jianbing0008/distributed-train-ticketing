@@ -17,7 +17,7 @@ drop table if exists `train`;
 
 create table `train` (
   `id` bigint not null comment 'id',
-  `code` varchar(20) not null comment '车次编号',
+  `trainCode` varchar(20) not null comment '车次编号',
   `type` char(1) not null comment '车次类型|枚举[TrainTypeEnum]',
   `start` varchar(20) not null comment '始发站',
   `start_pinyin` varchar(50) not null comment '始发站拼音',
@@ -28,7 +28,7 @@ create table `train` (
   `create_time` datetime(3) comment '新增时间',
   `update_time` datetime(3) comment '修改时间',
   primary key (`id`),
-  unique key `code_unique` (`code`)
+  unique key `code_unique` (`trainCode`)
 ) engine=innodb default charset=utf8mb4 comment='车次';
 
 
@@ -95,7 +95,7 @@ drop table if exists `daily_train`;
 create table `daily_train` (
   `id` bigint not null comment 'id',
   `date` date not null comment '日期',
-  `code` varchar(20) not null comment '车次编号',
+  `trainCode` varchar(20) not null comment '车次编号',
   `type` char(1) not null comment '车次类型|枚举[TrainTypeEnum]',
   `start` varchar(20) not null comment '始发站',
   `start_pinyin` varchar(50) not null comment '始发站拼音',
@@ -106,7 +106,7 @@ create table `daily_train` (
   `create_time` datetime(3) comment '新增时间',
   `update_time` datetime(3) comment '修改时间',
   primary key (`id`),
-  unique key `date_code_unique` (`date`, `code`)
+  unique key `date_code_unique` (`date`, `trainCode`)
 ) engine=innodb default charset=utf8mb4 comment='每日车次';
 
 
