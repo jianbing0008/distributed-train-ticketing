@@ -58,15 +58,25 @@ public class DailyTrainService {
     /**
      * 查询DailyTrain列表
      *
-     * @param req DailyTrain查询请求对象，可能包含DailyTrain的会员ID等查询条件
+     * @param req DailyTrain查询请求对象
      */
     public PageResp<DailyTrainQueryResp> queryList(DailyTrainQueryReq req){
         // 创建DailyTrain示例对象，用于构造查询条件
         DailyTrainExample dailyTrainExample = new DailyTrainExample();
-        //根据id倒序排序
-        dailyTrainExample.setOrderByClause("id desc");
+        //根据code倒序排序
+        dailyTrainExample.setOrderByClause("date desc, code asc");
         // 创建查询条件对象
         DailyTrainExample.Criteria criteria = dailyTrainExample.createCriteria();
+
+        if(ObjectUtil.isNotNull(req.getDate())){
+            criteria.andDateEqualTo(req.getDate());
+        }
+
+        if(ObjectUtil.isNotEmpty(req.getCode())){
+            criteria.andCodeEqualTo(req.getCode());
+        }
+
+
 
 
         // 记录查询日志

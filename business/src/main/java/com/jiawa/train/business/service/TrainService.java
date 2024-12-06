@@ -82,7 +82,7 @@ public class TrainService {
         // 创建Train示例对象，用于构造查询条件
         TrainExample trainExample = new TrainExample();
         //根据id倒序排序
-        trainExample.setOrderByClause("id desc");
+        trainExample.setOrderByClause("code asc");
         // 创建查询条件对象
         TrainExample.Criteria criteria = trainExample.createCriteria();
 
