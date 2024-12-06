@@ -3,8 +3,7 @@
     <a-space>
       <a-date-picker v-model:value="params.date" valueFormat="YYYY-MM-DD" placeholder="请选择日期" />
       <train-select-view v-model="params.trainCode" width="200px" ></train-select-view>
-      <a-button type="primary" @click="handleQuery()">刷新</a-button>
-      
+      <a-button type="primary" @click="handleQuery()">查询</a-button>
     </a-space>
   </p>
   <a-table :dataSource="dailyTrainSeats"
@@ -17,7 +16,7 @@
       </template>
       <template v-else-if="column.dataIndex === 'col'">
         <span v-for="item in SEAT_COL_ARRAY" :key="item.code">
-          <span v-if="item.code === record.col">
+          <span v-if="item.code === record.col && item.type === record.seatType">
             {{item.desc}}
           </span>
         </span>
