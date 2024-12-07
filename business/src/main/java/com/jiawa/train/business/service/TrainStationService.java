@@ -86,7 +86,7 @@ public class TrainStationService {
         return null;
     }
 
-    public List<TrainStation> selectByTrainingCode(String trainCode) {
+    public List<TrainStation> selectByTrainCode(String trainCode) {
         TrainStationExample trainStationExample = new TrainStationExample();
         trainStationExample.setOrderByClause("`index` ASC");
         trainStationExample.createCriteria().andTrainCodeEqualTo(trainCode);

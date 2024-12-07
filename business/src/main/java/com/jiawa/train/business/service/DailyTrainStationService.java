@@ -120,7 +120,7 @@ public class DailyTrainStationService {
      */
     public void genDaily(Date date, String trainCode) {
         log.info("生成日期【{}】车次【{}】的车站信息开始", DateUtil.formatDate(date), trainCode);
-        List<TrainStation> trainStationList = trainStationService.selectByTrainingCode(trainCode);
+        List<TrainStation> trainStationList = trainStationService.selectByTrainCode(trainCode);
         if(CollUtil.isEmpty(trainStationList)){
             log.info("该车次没有车站基础数据，生成该车次的车站信息结束");
             return;
