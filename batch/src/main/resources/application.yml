@@ -4,6 +4,8 @@ server:
     context-path: /batch
 
 spring:
+  application:
+    name: batch
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/train_batch?characterEncoding=UTF8&autoReconnect=true&serverTimezone=Asia/Shanghai
