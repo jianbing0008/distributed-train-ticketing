@@ -158,7 +158,5 @@ public class DailyTrainCarriageService {
         dailyTrainCarriage.setDate(date);
         dailyTrainCarriageMapper.insert(dailyTrainCarriage);
 
-
-
     }
 }

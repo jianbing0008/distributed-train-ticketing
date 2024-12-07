@@ -1,14 +1,16 @@
 package com.jiawa.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jiawa.train.business.domain.*;
 import com.jiawa.train.common.resp.PageResp;
 import com.jiawa.train.common.util.SnowUtil;
-import com.jiawa.train.business.domain.DailyTrainSeat;
-import com.jiawa.train.business.domain.DailyTrainSeatExample;
 import com.jiawa.train.business.mapper.DailyTrainSeatMapper;
 import com.jiawa.train.business.req.DailyTrainSeatQueryReq;
 import com.jiawa.train.business.req.DailyTrainSeatSaveReq;
@@ -17,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -28,6 +31,10 @@ public class DailyTrainSeatService {
 
     @Autowired
     private DailyTrainSeatMapper dailyTrainSeatMapper;
+    @Autowired
+    private TrainSeatService trainSeatService;
+    @Autowired
+    private TrainStationService trainStationsService;
 
     /**
      * 保存DailyTrainSeat信息
@@ -98,5 +105,54 @@ public class DailyTrainSeatService {
 
     public void delete(Long id) {
         dailyTrainSeatMapper.deleteByPrimaryKey(id);
+    }
+
+    /**
+     * 生成某日座位信息
+     * @param date
+     * @param trainCode
+     */
+    public void genDaily(Date date, String trainCode) {
+        log.info("生成日期【{}】车次【{}】的座位信息开始", DateUtil.formatDate(date), trainCode);
+        List<TrainSeat> trainSeatList = trainSeatService.selectByTrainCode(trainCode);
+        if(CollUtil.isEmpty(trainSeatList)){
+            log.info("该车次没有座位基础数据，生成该车次的座位信息结束");
+            return;
+        }
+        // 生成一个由'0'组成的字符串,意义为：A-B站之间的票是否被卖出，其长度为车站数量减去1
+        List<TrainStation> trainStationList = trainStationsService.selectByTrainCode(trainCode);
+        String sell = StrUtil.fillBefore("", '0', trainStationList.size()-1);
+
+        for (TrainSeat trainSeat : trainSeatList) {
+            genDailyStation(date, trainCode, trainSeat, sell);
+        }
+        log.info("生成日期【{}】车次【{}】的座位信息结束", DateUtil.formatDate(date), trainCode);
+    }
+
+    /**
+     * 生成座位信息
+     * @param date
+     * @param trainCode
+     * @param trainSeat
+     */
+    private void genDailyStation(Date date, String trainCode, TrainSeat trainSeat,String sell) {
+        // 删除之前数据
+        DailyTrainSeatExample dailyTrainSeatExample = new DailyTrainSeatExample();
+        // 删除指定日期、车次、车厢索引的数据
+        dailyTrainSeatExample.createCriteria()
+                .andDateEqualTo(date)
+                .andTrainCodeEqualTo(trainCode)
+                .andCarriageIndexEqualTo(trainSeat.getCarriageIndex());
+        dailyTrainSeatMapper.deleteByExample(dailyTrainSeatExample);
+
+        // 生成数据
+        Date now = DateTime.now();
+        DailyTrainSeat dailyTrainSeat = BeanUtil.copyProperties(trainSeat, DailyTrainSeat.class);
+        dailyTrainSeat.setId(SnowUtil.getSnowflakeNextId());
+        dailyTrainSeat.setCreateTime(now);
+        dailyTrainSeat.setUpdateTime(now);
+        dailyTrainSeat.setDate(date);
+        dailyTrainSeat.setSell(sell);
+        dailyTrainSeatMapper.insert(dailyTrainSeat);
     }
 }
