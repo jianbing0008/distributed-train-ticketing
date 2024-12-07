@@ -71,7 +71,7 @@ public class DailyTrainSeatService {
         // 创建DailyTrainSeat示例对象，用于构造查询条件
         DailyTrainSeatExample dailyTrainSeatExample = new DailyTrainSeatExample();
         //根据id倒序排序
-        dailyTrainSeatExample.setOrderByClause("train_code asc, carriage_index asc, carriage_seat_index asc");
+        dailyTrainSeatExample.setOrderByClause("date desc, train_code asc, carriage_index asc, carriage_seat_index asc");
         // 创建查询条件对象
         DailyTrainSeatExample.Criteria criteria = dailyTrainSeatExample.createCriteria();
 
