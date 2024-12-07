@@ -1,22 +1,26 @@
 package com.jiawa.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jiawa.train.common.resp.PageResp;
-import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.business.domain.DailyTrainStation;
 import com.jiawa.train.business.domain.DailyTrainStationExample;
+import com.jiawa.train.business.domain.TrainStation;
 import com.jiawa.train.business.mapper.DailyTrainStationMapper;
 import com.jiawa.train.business.req.DailyTrainStationQueryReq;
 import com.jiawa.train.business.req.DailyTrainStationSaveReq;
 import com.jiawa.train.business.resp.DailyTrainStationQueryResp;
+import com.jiawa.train.common.resp.PageResp;
+import com.jiawa.train.common.util.SnowUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -28,6 +32,9 @@ public class DailyTrainStationService {
 
     @Autowired
     private DailyTrainStationMapper dailyTrainStationMapper;
+    @Autowired
+    private TrainStationService trainStationService;
+
 
     /**
      * 保存DailyTrainStation信息
@@ -64,7 +71,7 @@ public class DailyTrainStationService {
         // 创建DailyTrainStation示例对象，用于构造查询条件
         DailyTrainStationExample dailyTrainStationExample = new DailyTrainStationExample();
         //根据id倒序排序
-        dailyTrainStationExample.setOrderByClause("date desc, train_code asc, `index asc`");
+        dailyTrainStationExample.setOrderByClause("date desc, train_code asc, `index` asc");
         // 创建查询条件对象
         DailyTrainStationExample.Criteria criteria = dailyTrainStationExample.createCriteria();
 
@@ -103,5 +110,52 @@ public class DailyTrainStationService {
 
     public void delete(Long id) {
         dailyTrainStationMapper.deleteByPrimaryKey(id);
+    }
+
+
+    /**
+     * 生成某日车站信息
+     * @param date
+     * @param trainCode
+     */
+    public void genDaily(Date date, String trainCode) {
+        log.info("生成日期【{}】车次【{}】的车站信息开始", DateUtil.formatDate(date), trainCode);
+        List<TrainStation> trainStationList = trainStationService.selectByTrainingCode(trainCode);
+        if(CollUtil.isEmpty(trainStationList)){
+            log.info("该车次没有车站基础数据，生成该车次的车站信息结束");
+            return;
+        }
+        for (TrainStation trainStation : trainStationList) {
+            genDailyStation(date, trainCode, trainStation);
+        }
+        log.info("生成日期【{}】车次【{}】的车站信息结束", DateUtil.formatDate(date), trainCode);
+    }
+
+    /**
+     * 生成车站信息
+     * @param date
+     * @param trainCode
+     * @param trainStation
+     */
+    private void genDailyStation(Date date, String trainCode, TrainStation trainStation) {
+        // 删除之前数据
+        DailyTrainStationExample dailyTrainStationExample = new DailyTrainStationExample();
+        dailyTrainStationExample.createCriteria()
+                .andDateEqualTo(date)
+                .andTrainCodeEqualTo(trainCode)
+                .andIndexEqualTo(trainStation.getIndex());
+        dailyTrainStationMapper.deleteByExample(dailyTrainStationExample);
+
+        // 生成数据
+        Date now = DateTime.now();
+        DailyTrainStation dailyTrainStation = BeanUtil.copyProperties(trainStation, DailyTrainStation.class);
+        dailyTrainStation.setId(SnowUtil.getSnowflakeNextId());
+        dailyTrainStation.setCreateTime(now);
+        dailyTrainStation.setUpdateTime(now);
+        dailyTrainStation.setDate(date);
+        dailyTrainStationMapper.insert(dailyTrainStation);
+
+
+
     }
 }

@@ -3,6 +3,7 @@ package com.jiawa.train.business.service;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -33,6 +34,8 @@ public class DailyTrainService {
     private DailyTrainMapper dailyTrainMapper;
     @Autowired
     private TrainService trainService;
+    @Autowired
+    private DailyTrainStationService dailyTrainStationService;
 
     /**
      * 保存DailyTrain信息
@@ -127,6 +130,7 @@ public class DailyTrainService {
         for (Train train : trainList) {
             genDailyTrain(date, train);
         }
+        log.info("生成日期【{}】的train数据结束", date);
     }
 
     /**
@@ -135,13 +139,14 @@ public class DailyTrainService {
      * @param train
      */
     public void genDailyTrain(Date date, Train train) {
+        log.info("生成日期【{}】车次【{}】的数据开始", DateUtil.formatDate(date), train.getCode());
         //生成前进行判断是否生成过数据了  在循环体进行判断  高内聚低耦合  删除已有当天数据
         DailyTrainExample dailyTrainExample = new DailyTrainExample();
         dailyTrainExample.createCriteria().
                 andDateEqualTo(date).
                 andCodeEqualTo(train.getCode());
         dailyTrainMapper.deleteByExample(dailyTrainExample);
-        // 生成数据
+        // 生成该车次的数据
         Date now = DateTime.now();
         DailyTrain dailyTrain = BeanUtil.copyProperties(train, DailyTrain.class);
         dailyTrain.setId(SnowUtil.getSnowflakeNextId());
@@ -149,5 +154,9 @@ public class DailyTrainService {
         dailyTrain.setUpdateTime(now);
         dailyTrain.setDate(date);
         dailyTrainMapper.insert(dailyTrain);
+
+        // 生成该车次的车站数据
+        dailyTrainStationService.genDaily(date, train.getCode());
+        log.info("生成日期【{}】车次【{}】的数据结束", DateUtil.formatDate(date), train.getCode());
     }
 }

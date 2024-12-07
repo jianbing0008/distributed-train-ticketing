@@ -21,6 +21,7 @@ public class DailyTrainJob implements Job {
     @Resource
     private BusinessFeign businessFeign;
 
+
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         // 增加日志流水号
