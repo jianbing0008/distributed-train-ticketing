@@ -19,6 +19,7 @@ import com.jiawa.train.common.util.SnowUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -40,6 +41,8 @@ public class DailyTrainService {
     private DailyTrainCarriageService dailyTrainCarriageService;
     @Autowired
     private DailyTrainSeatService dailyTrainSeatService;
+    @Autowired
+    private DailyTrainTicketService dailyTrainTicketService;
 
     /**
      * 保存DailyTrain信息
@@ -142,6 +145,7 @@ public class DailyTrainService {
      * @param date
      * @param train
      */
+    @Transactional
     public void genDailyTrain(Date date, Train train) {
         log.info("生成日期【{}】车次【{}】的数据开始", DateUtil.formatDate(date), train.getCode());
         //生成前进行判断是否生成过数据了  在循环体进行判断  高内聚低耦合  删除已有当天数据
@@ -163,8 +167,15 @@ public class DailyTrainService {
 
         // 生成该车次的车站数据
         dailyTrainStationService.genDaily(date, train.getCode());
+
+        // 生成该车次的车厢数据
         dailyTrainCarriageService.genDaily(date, train.getCode());
+
+        // 生成该车次的座位数据
         dailyTrainSeatService.genDaily(date, train.getCode());
+
+        // 生成该车次的余票数据
+        dailyTrainTicketService.genDaily(date, train.getCode());
 
     }
 }

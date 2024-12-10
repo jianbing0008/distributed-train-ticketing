@@ -18,6 +18,7 @@ import com.jiawa.train.business.resp.DailyTrainSeatQueryResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -112,6 +113,7 @@ public class DailyTrainSeatService {
      * @param date
      * @param trainCode
      */
+    @Transactional
     public void genDaily(Date date, String trainCode) {
         log.info("生成日期【{}】车次【{}】的座位信息开始", DateUtil.formatDate(date), trainCode);
         List<TrainSeat> trainSeatList = trainSeatService.selectByTrainCode(trainCode);
@@ -138,11 +140,12 @@ public class DailyTrainSeatService {
     private void genDailyStation(Date date, String trainCode, TrainSeat trainSeat,String sell) {
         // 删除之前数据
         DailyTrainSeatExample dailyTrainSeatExample = new DailyTrainSeatExample();
-        // 删除指定日期、车次、车厢索引的数据
         dailyTrainSeatExample.createCriteria()
                 .andDateEqualTo(date)
                 .andTrainCodeEqualTo(trainCode)
-                .andCarriageIndexEqualTo(trainSeat.getCarriageIndex());
+                .andCarriageIndexEqualTo(trainSeat.getCarriageIndex())
+                .andRowEqualTo(trainSeat.getRow())
+                .andColEqualTo(trainSeat.getCol());
         dailyTrainSeatMapper.deleteByExample(dailyTrainSeatExample);
 
         // 生成数据
