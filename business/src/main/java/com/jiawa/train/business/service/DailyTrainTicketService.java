@@ -85,6 +85,19 @@ public class DailyTrainTicketService {
         // 创建查询条件对象
         DailyTrainTicketExample.Criteria criteria = dailyTrainTicketExample.createCriteria();
 
+        if(ObjectUtil.isNotNull(req.getDate())){
+            criteria.andDateEqualTo(req.getDate());
+        }
+        if(ObjectUtil.isNotEmpty(req.getTrainCode())){
+            criteria.andTrainCodeEqualTo(req.getTrainCode());
+        }
+        if(ObjectUtil.isNotEmpty(req.getStart())){
+            criteria.andStartEqualTo(req.getStart());
+        }
+        if(ObjectUtil.isNotEmpty(req.getEnd())){
+            criteria.andEndEqualTo(req.getEnd());
+        }
+
 
         // 记录查询日志
         log.info("查询页码：{}", req.getPage());
