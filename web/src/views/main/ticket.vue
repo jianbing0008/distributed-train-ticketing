@@ -168,7 +168,7 @@ export default defineComponent({
     ];
 
     const toOrder = (record) => {
-      SessionStorage.set(SESSION_ORDER, JSON.stringify(record))
+      SessionStorage.set(SESSION_ORDER, record)
       router.push('/order')
     };
 
