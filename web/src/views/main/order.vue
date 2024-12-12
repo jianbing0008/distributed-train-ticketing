@@ -82,12 +82,23 @@
         <br/>
       </div>
 
-      <div> <br/>
-      选座类型chooseSeatType：{{chooseSeatType}}
+      <div v-if="chooseSeatType === 0" style="color: red;">
+        您购买的车票不支持选座
+        <div>12306规则：只有全部是一等座或全部是二等座才支持选座</div>
+        <div>12306规则：余票小于一定数量时，不允许选座（本项目以20为例）</div>
+      </div>
+      <div v-else style="text-align: center">
+        <a-switch class="choose-seat-item" v-for="item in SEAT_COL_ARRAY" :key="item.code"
+                  v-model:checked="chooseSeatObj[item.code + '1']" :checked-children="item.desc" :un-checked-children="item.desc" />
+        <div v-if="tickets.length > 1">
+          <a-switch class="choose-seat-item" v-for="item in SEAT_COL_ARRAY" :key="item.code"
+                    v-model:checked="chooseSeatObj[item.code + '2']" :checked-children="item.desc" :un-checked-children="item.desc" />
+        </div>
+        <div style="color: #999999">提示：您可以选择{{tickets.length}}个座位</div>
+      </div>
       <br/>
-      选座对象chooseSeatType：{{chooseSeatObj}}
-      <br/>
-      座位类型SEAT_COL_ARRAY：{{SEAT_COL_ARRAY}}</div>
+      最终购票：{{tickets}}
+      最终选座：{{chooseSeatObj}}
 
     </a-modal>
   </div>
@@ -107,9 +118,12 @@ export default defineComponent({
     const dailyTrainTicket = SessionStorage.get(SESSION_ORDER) || {}
     console.log("下单车票信息" + dailyTrainTicket)
 
+    //座位类型
     const SEAT_TYPE = window.SEAT_TYPE;
+    //乘客类型
     const PASSENGER_TYPE_ARRAY = window.PASSENGER_TYPE_ARRAY;
 
+    //乘客的票
     const tickets = ref([]);
     const visible = ref(false);
 
@@ -129,6 +143,7 @@ export default defineComponent({
 
     //通过乘客选择车座类型后，再初始化车座
     watch(() => SEAT_COL_ARRAY.value, () => {
+      // 乘客重新选车座 先清空再赋值 防止保留数据遗留
       chooseSeatObj.value = {};
       for (let i = 1; i <= 2; i++) {
         SEAT_COL_ARRAY.value.forEach((item) => {
@@ -137,6 +152,37 @@ export default defineComponent({
       }
       console.log("初始化两排座位，都是未选中：", chooseSeatObj.value);
     }, {immediate: true});
+
+    // handleOk点击提交检验选中座位事件
+    const handleOk = () => {
+      console.log("选好的座位：", chooseSeatObj.value);
+
+      // 设置每张票的座位
+      // 先清空购票列表的座位，有可能之前选了并设置座位了，但选座数不对被拦截了，又重新选一遍
+      for (let i = 0; i < tickets.value.length; i++) {
+        tickets.value[i].seat = null;
+      }
+      let i = -1;
+      // 要么不选座位，要么所选座位应该等于购票数，即i === (tickets.value.length - 1)
+      for (let key in chooseSeatObj.value) {
+        if (chooseSeatObj.value[key]) {
+          i++;
+          if (i > tickets.value.length - 1) {
+            notification.error({description: '所选座位数大于购票数'});
+            return;
+          }
+          // key : A1 B1 C1
+          tickets.value[i].seat = key;
+        }
+      }
+      if (i > -1 && i < (tickets.value.length - 1)) {
+        notification.error({description: '所选座位数小于购票数'});
+        return;
+      }
+
+      console.log("最终购票：", tickets.value);
+
+    }
 
 
 
@@ -305,6 +351,7 @@ export default defineComponent({
       chooseSeatType,
       SEAT_COL_ARRAY,
       chooseSeatObj,
+      handleOk
     }
   }
 })
