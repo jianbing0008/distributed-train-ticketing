@@ -18,7 +18,10 @@
     </div>
   </div>
   <a-divider></a-divider>
-  <div>{{passgeners}}</div>
+  <b>勾选要购票的乘客：</b>&nbsp;
+  <a-checkbox-group v-model:value="passengerCheck" :options="passengerOption"/>
+  <br/>
+  选中的乘客：{{passengerCheck}}
 </template>
 
 <script >
@@ -28,7 +31,9 @@ import {notification} from "ant-design-vue";
 export default defineComponent({
   name: "order-view",
   setup(){
-    const passgeners = ref([])
+    const passengers = ref([])
+    const passengerOption = ref([]) //列表展示
+    const passengerCheck = ref([]) //勾选的值
     const dailyTrainTicket = SessionStorage.get(SESSION_ORDER) || {}
     console.log("下单车票信息" + dailyTrainTicket)
 
@@ -65,7 +70,13 @@ export default defineComponent({
       axios.get("/member/passenger//query-mine").then(response => {
         let data = response.data;
         if (data.success) {
-          passgeners.value=data.content;
+          passengers.value=data.content;
+          passengers.value.forEach((item) => passengerOption.value.push(
+              {
+                label: item.name,//在列表中的显示
+                value: item.id,//选中后返回给后端的参数
+              }
+          ))
         } else {
           notification.error({description: data.message});
         }
@@ -81,7 +92,9 @@ export default defineComponent({
       dailyTrainTicket,
       seatTypes,
       handQueryPassenger,
-      passgeners,
+      passengers,
+      passengerOption,
+      passengerCheck,
     }
   }
 })
