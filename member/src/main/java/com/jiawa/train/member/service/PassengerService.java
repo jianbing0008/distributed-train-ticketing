@@ -101,4 +101,20 @@ public class PassengerService {
     public void delete(Long id) {
         passengerMapper.deleteByPrimaryKey(id);
     }
+
+    /**
+     * 查找我的所有乘客
+     */
+    public List<PassengerQueryResp> queryMine(){
+        // 创建Passenger示例对象，用于构造查询条件
+        PassengerExample passengerExample = new PassengerExample();
+        //根据id倒序排序
+        passengerExample.setOrderByClause("name asc");
+        // 创建查询条件对象
+        PassengerExample.Criteria criteria = passengerExample.createCriteria();
+        // 如果请求对象中的会员ID不为空，则添加会员ID作为查询条件
+        criteria.andMemberIdEqualTo(LoginMemberContext.getId());
+        List<Passenger> passengerList = passengerMapper.selectByExample(passengerExample);
+        return BeanUtil.copyToList(passengerList, PassengerQueryResp.class);
+    }
 }

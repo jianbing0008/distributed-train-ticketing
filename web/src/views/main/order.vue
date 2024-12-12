@@ -17,13 +17,18 @@
 
     </div>
   </div>
+  <a-divider></a-divider>
+  <div>{{passgeners}}</div>
 </template>
 
 <script >
-import {defineComponent} from "vue";
+import {defineComponent, onMounted,ref} from "vue";
+import axios from "axios";
+import {notification} from "ant-design-vue";
 export default defineComponent({
   name: "order-view",
   setup(){
+    const passgeners = ref([])
     const dailyTrainTicket = SessionStorage.get(SESSION_ORDER) || {}
     console.log("下单车票信息" + dailyTrainTicket)
 
@@ -56,9 +61,27 @@ export default defineComponent({
     }
     console.log("本车次提供的座位：", seatTypes)
 
+    const handQueryPassenger = () => {
+      axios.get("/member/passenger//query-mine").then(response => {
+        let data = response.data;
+        if (data.success) {
+          passgeners.value=data.content;
+        } else {
+          notification.error({description: data.message});
+        }
+      });
+    };
+
+
+    onMounted(() =>{
+      handQueryPassenger()
+    })
+
     return {
       dailyTrainTicket,
-      seatTypes
+      seatTypes,
+      handQueryPassenger,
+      passgeners,
     }
   }
 })
