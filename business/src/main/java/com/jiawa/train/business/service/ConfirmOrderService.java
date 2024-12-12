@@ -5,13 +5,13 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jiawa.train.business.req.ConfirmOrderDoReq;
 import com.jiawa.train.common.resp.PageResp;
 import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.business.domain.ConfirmOrder;
 import com.jiawa.train.business.domain.ConfirmOrderExample;
 import com.jiawa.train.business.mapper.ConfirmOrderMapper;
 import com.jiawa.train.business.req.ConfirmOrderQueryReq;
-import com.jiawa.train.business.req.ConfirmOrderSaveReq;
 import com.jiawa.train.business.resp.ConfirmOrderQueryResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +34,12 @@ public class ConfirmOrderService {
      *
      * @param req ConfirmOrder保存请求对象，包含ConfirmOrder的基本信息
      */
-    public void save(ConfirmOrderSaveReq req){
+    public void save(ConfirmOrderDoReq req){
         // 获取当前时间，用于记录ConfirmOrder信息的创建和更新时间
         DateTime now = DateTime.now();
         // 将请求对象转换为ConfirmOrder对象，便于后续操作
         ConfirmOrder confirmOrder = BeanUtil.copyProperties(req, ConfirmOrder.class);
-        if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增ConfirmOrder
+        if(ObjectUtil.isNull(req.getTickets())){ // 判断是否为空，为空则是新增ConfirmOrder
             // 设置ConfirmOrder的会员ID，来源于登录会员上下文
             // 生成ConfirmOrder的唯一ID
             confirmOrder.setId(SnowUtil.getSnowflakeNextId());
@@ -95,5 +95,29 @@ public class ConfirmOrderService {
 
     public void delete(Long id) {
         confirmOrderMapper.deleteByPrimaryKey(id);
+    }
+
+
+    public void doConfirm(ConfirmOrderDoReq req){
+        // 省略业务数据校验，如：车次是否存在，余票是否存在，车次是否在有效期内，tickets条数>0，同乘客同车次是否已买过
+
+        // 保存确认订单表，状态初始
+
+        // 查出余票记录，需要得到真实的库存
+
+        // 扣减余票数量，并判断余票是否足够
+
+        // 选座
+
+        // 一个车箱一个车箱的获取座位数据
+
+        // 挑选符合条件的座位，如果这个车箱不满足，则进入下个车箱（多个选座应该在同一个车厢）
+
+        // 选中座位后事务处理：
+
+        // 座位表修改售卖情况sell；
+        // 余票详情表修改余票；
+        // 为会员增加购票记录
+        // 更新确认订单为成功
     }
 }
