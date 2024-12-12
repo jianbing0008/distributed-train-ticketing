@@ -168,7 +168,7 @@ export default defineComponent({
     ];
 
     const toOrder = (record) => {
-      SessionStorage.set('dailyTrainTicket', JSON.stringify(record))
+      SessionStorage.set(SESSION_ORDER, JSON.stringify(record))
       router.push('/order')
     };
 
@@ -192,6 +192,8 @@ export default defineComponent({
           size: pagination.value.pageSize
         };
       }
+      //保存查询参数到Session中
+      SessionStorage.set(SESSION_TICKET_PARAMS, params.value);
       loading.value = true;
       axios.get("/business/daily-train-ticket/query-list", {
         params: {
@@ -233,10 +235,14 @@ export default defineComponent({
 
 
     onMounted(() => {
-      // handleQuery({
-      //   page: 1,
-      //   size: pagination.value.pageSize
-      // });
+      params.value = SessionStorage.get(SESSION_TICKET_PARAMS) || {};
+      if (Tool.isNotEmpty(params.value)) {
+        handleQuery({
+          page: 1,
+          size: pagination.value.pageSize
+        });
+      }
+
     });
 
     return {
