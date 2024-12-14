@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jiawa.train.business.domain.DailyTrainTicket;
 import com.jiawa.train.business.enums.ConfirmOrderStatusEnum;
 import com.jiawa.train.business.req.ConfirmOrderDoReq;
 import com.jiawa.train.common.context.LoginMemberContext;
@@ -31,6 +32,8 @@ public class ConfirmOrderService {
 
     @Autowired
     private ConfirmOrderMapper confirmOrderMapper;
+    @Autowired
+    private DailyTrainTicketService dailyTrainTicketService;
 
     /**
      * 保存ConfirmOrder信息
@@ -124,6 +127,8 @@ public class ConfirmOrderService {
         confirmOrderMapper.insert(confirmOrder);
 
         // 查出余票记录，需要得到真实的库存
+        DailyTrainTicket dailyTrainTicket = dailyTrainTicketService.selectByUnique(req.getDate(), req.getTrainCode(), req.getStart(), req.getEnd());
+        log.info("查出余票信息：{}", dailyTrainTicket);
 
         // 扣减余票数量，并判断余票是否足够
 

@@ -8,10 +8,7 @@ import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jiawa.train.business.domain.DailyTrain;
-import com.jiawa.train.business.domain.DailyTrainTicket;
-import com.jiawa.train.business.domain.DailyTrainTicketExample;
-import com.jiawa.train.business.domain.TrainStation;
+import com.jiawa.train.business.domain.*;
 import com.jiawa.train.business.enums.SeatTypeEnum;
 import com.jiawa.train.business.enums.TrainTypeEnum;
 import com.jiawa.train.business.mapper.DailyTrainTicketMapper;
@@ -205,6 +202,28 @@ public class DailyTrainTicketService {
                 log.info("查询【{}】车次，【{}】-【{}】的余票信息结束", trainCode, start.getName(), end.getName());
             }
         }
+    }
+
+    /**
+     * 按唯一键查询
+     * @param date
+     * @param trainCode
+     * @param start
+     * @param end
+     * @return
+     */
+    public DailyTrainTicket selectByUnique(Date date, String trainCode,String start, String end) {
+        DailyTrainTicketExample dailyTrainTicketExample = new DailyTrainTicketExample();
+        dailyTrainTicketExample.createCriteria()
+                .andDateEqualTo(date)
+                .andTrainCodeEqualTo(trainCode)
+                .andStartEqualTo(start)
+                .andEndEqualTo(end);
+        List<DailyTrainTicket> list = dailyTrainTicketMapper.selectByExample(dailyTrainTicketExample);
+        if(CollUtil.isNotEmpty(list)){
+            return list.get(0);
+        }
+        return null;
     }
 
 }
