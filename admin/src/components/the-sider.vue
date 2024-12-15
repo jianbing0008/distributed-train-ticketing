@@ -5,7 +5,7 @@
         v-model:openKeys="openKeys"
         mode="inline"
         :style="{ height: '100%', borderRight: 0 }"
-        :openKeys="['batch', 'base','business']"
+        :openKeys="['batch', 'base', 'member','business']"
     >
       <a-menu-item key="/welcome">
         <router-link to="/welcome">
@@ -18,6 +18,22 @@
           <user-outlined /> &nbsp; 关于
         </router-link>
       </a-menu-item>
+
+      <a-sub-menu key="member">
+        <template #title>
+          <span>
+            <UnorderedListOutlined />
+            会员管理
+          </span>
+        </template>
+
+        <a-menu-item key="/member/ticket">
+          <router-link to="/member/ticket">
+            <MenuUnfoldOutlined /> &nbsp; 会员车票
+          </router-link>
+        </a-menu-item>
+      </a-sub-menu>
+
 
       <a-sub-menu key="business">
         <template #title>
