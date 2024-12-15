@@ -2,6 +2,7 @@ package com.jiawa.train.member.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jiawa.train.common.req.MemberTicketReq;
@@ -11,7 +12,6 @@ import com.jiawa.train.member.domain.Ticket;
 import com.jiawa.train.member.domain.TicketExample;
 import com.jiawa.train.member.mapper.TicketMapper;
 import com.jiawa.train.member.req.TicketQueryReq;
-import com.jiawa.train.member.req.TicketSaveReq;
 import com.jiawa.train.member.resp.TicketQueryResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,24 +29,7 @@ public class TicketService {
     @Autowired
     private TicketMapper ticketMapper;
 
-    /**
-     * 保存Ticket信息
-     *
-     * @param req Ticket保存请求对象，包含Ticket的基本信息
-     */
-    public void save(TicketSaveReq req){
-        // 获取当前时间，用于记录Ticket信息的创建和更新时间
-        DateTime now = DateTime.now();
-        // 将请求对象转换为Ticket对象，便于后续操作
-        Ticket ticket = BeanUtil.copyProperties(req, Ticket.class);
-            // 生成Ticket的唯一ID
-            ticket.setId(SnowUtil.getSnowflakeNextId());
-            // 设置Ticket信息的创建和更新时间为当前时间
-            ticket.setCreateTime(now);
-            ticket.setUpdateTime(now);
-            // 插入Ticket信息到数据库
-            ticketMapper.insert(ticket);
-    }
+
 
     public void save(MemberTicketReq req) {
         DateTime now = DateTime.now();
@@ -70,6 +53,9 @@ public class TicketService {
         // 创建查询条件对象
         TicketExample.Criteria criteria = ticketExample.createCriteria();
 
+        if(ObjectUtil.isNotNull(req.getMemberId())) {
+            criteria.andMemberIdEqualTo(req.getMemberId());
+        }
 
         // 记录查询日志
         log.info("查询页码：{}", req.getPage());

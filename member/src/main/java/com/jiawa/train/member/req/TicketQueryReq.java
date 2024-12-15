@@ -1,12 +1,12 @@
 package com.jiawa.train.member.req;
 
 import com.jiawa.train.common.req.PageReq;
+import lombok.Data;
+import lombok.ToString;
 
+@Data
+@ToString
 public class TicketQueryReq extends PageReq {
 
-    @Override
-    public String toString() {
-        return "TicketQueryReq{" +
-                "} " + super.toString();
-    }
+   private Long memberId;
 }
