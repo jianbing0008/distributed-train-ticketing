@@ -47,6 +47,8 @@ public class ConfirmOrderService {
     private DailyTrainCarriageService dailyTrainCarriageService;
     @Autowired
     private DailyTrainSeatService dailyTrainSeatService;
+    @Autowired
+    private AfterConfirmOrderService afterConfirmOrderService;
 
     /**
      * 保存ConfirmOrder信息
@@ -206,18 +208,12 @@ public class ConfirmOrderService {
         }
         log.info("最终的选座结果：{}", finalSeatList);
 
-        // 选座
-
-            // 一个车箱一个车箱的获取座位数据
-
-            // 挑选符合条件的座位，如果这个车箱不满足，则进入下个车箱（多个选座应该在同一个车厢）
-
         // 选中座位后事务处理：
-
-        // 座位表修改售卖情况sell；
-        // 余票详情表修改余票；
-        // 为会员增加购票记录
-        // 更新确认订单为成功
+            // 座位表修改售卖情况sell；
+            // 余票详情表修改余票；
+            // 为会员增加购票记录
+            // 更新确认订单为成功
+        afterConfirmOrderService.afterDoConfirm(finalSeatList);
     }
 
     /**
