@@ -2,8 +2,13 @@ package com.jiawa.train.business.service;
 
 import com.jiawa.train.business.domain.DailyTrainSeat;
 import com.jiawa.train.business.domain.DailyTrainTicket;
+import com.jiawa.train.business.feign.MemberFeign;
 import com.jiawa.train.business.mapper.DailyTrainSeatMapper;
 import com.jiawa.train.business.mapper.cust.DailyTrainTicketMapperCust;
+import com.jiawa.train.business.req.ConfirmOrderTicketReq;
+import com.jiawa.train.common.context.LoginMemberContext;
+import com.jiawa.train.common.req.MemberTicketReq;
+import com.jiawa.train.common.resp.CommonResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +26,9 @@ public class AfterConfirmOrderService {
     private DailyTrainSeatMapper dailyTrainSeatMapper;
     @Autowired
     private DailyTrainTicketMapperCust dailyTrainTicketMapperCust;
+    @Autowired
+    private MemberFeign memberFeign;
+
 
     /**
      * 选中座位后事务处理：
@@ -31,8 +39,9 @@ public class AfterConfirmOrderService {
      * @param finalSeatList
      */
     @Transactional
-    public void afterDoConfirm(DailyTrainTicket dailyTrainTicket,List<DailyTrainSeat> finalSeatList){
-        for (DailyTrainSeat dailyTrainSeat : finalSeatList) {
+    public void afterDoConfirm(DailyTrainTicket dailyTrainTicket,List<DailyTrainSeat> finalSeatList,List<ConfirmOrderTicketReq> tickets) {
+        for (int j = 0; j < finalSeatList.size(); j++) {
+            DailyTrainSeat dailyTrainSeat = finalSeatList.get(j);
             DailyTrainSeat seatForUpdate = new DailyTrainSeat();
             seatForUpdate.setId(dailyTrainSeat.getId());
             seatForUpdate.setSell(dailyTrainSeat.getSell());
@@ -89,7 +98,7 @@ public class AfterConfirmOrderService {
             Integer minStartIndex = 0;
             for (int i = startIndex - 1; i >= 0; i--) {
                 if (chars[i] == '1') {
-                    minStartIndex = i+1;
+                    minStartIndex = i + 1;
                     break;
                 }
             }
@@ -108,9 +117,32 @@ public class AfterConfirmOrderService {
                     dailyTrainSeat.getSeatType(),
                     minStartIndex, maxStartIndex, minEndIndex, maxEndIndex);
 
+            //调用会员服务接口，为会员增加一张车票
+            MemberTicketReq memberTicketReq = new MemberTicketReq();
+            memberTicketReq.setId(LoginMemberContext.getId());
+            memberTicketReq.setMemberId(dailyTrainTicket.getId());
+            memberTicketReq.setPassengerId(tickets.get(j).getPassengerId());
+            memberTicketReq.setPassengerName(tickets.get(j).getPassengerName());
+            memberTicketReq.setTrainDate(dailyTrainTicket.getDate());
+            memberTicketReq.setTrainCode(dailyTrainSeat.getTrainCode());
+            memberTicketReq.setCarriageIndex(dailyTrainSeat.getCarriageIndex());
+            memberTicketReq.setSeatRow(dailyTrainSeat.getRow());
+            memberTicketReq.setSeatCol(dailyTrainSeat.getCol());
+            memberTicketReq.setStartStation(dailyTrainTicket.getStart());
+            memberTicketReq.setStartTime(dailyTrainTicket.getStartTime());
+            memberTicketReq.setEndStation(dailyTrainTicket.getEnd());
+            memberTicketReq.setEndTime(dailyTrainTicket.getEndTime());
+            memberTicketReq.setSeatType(dailyTrainSeat.getSeatType());
+            memberTicketReq.setCreateTime(dailyTrainTicket.getStartTime());
+            memberTicketReq.setUpdateTime(dailyTrainTicket.getUpdateTime());
+            CommonResp<Object> commonResp = memberFeign.save(memberTicketReq);
+            log.info("调用member，返回：{}",commonResp);
+
+
         }
 
+
+
+
     }
-
-
 }

@@ -2,9 +2,9 @@ package com.jiawa.train.member.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jiawa.train.common.req.MemberTicketReq;
 import com.jiawa.train.common.resp.PageResp;
 import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.member.domain.Ticket;
@@ -39,8 +39,6 @@ public class TicketService {
         DateTime now = DateTime.now();
         // 将请求对象转换为Ticket对象，便于后续操作
         Ticket ticket = BeanUtil.copyProperties(req, Ticket.class);
-        if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增Ticket
-            // 设置Ticket的会员ID，来源于登录会员上下文
             // 生成Ticket的唯一ID
             ticket.setId(SnowUtil.getSnowflakeNextId());
             // 设置Ticket信息的创建和更新时间为当前时间
@@ -48,11 +46,15 @@ public class TicketService {
             ticket.setUpdateTime(now);
             // 插入Ticket信息到数据库
             ticketMapper.insert(ticket);
-        }else{  // 不为空则更新Ticket信息
-            ticket.setUpdateTime(now);
-            ticketMapper.updateByPrimaryKey(ticket);
-        }
+    }
 
+    public void save(MemberTicketReq req) {
+        DateTime now = DateTime.now();
+        Ticket ticket = BeanUtil.copyProperties(req, Ticket.class);
+        ticket.setId(SnowUtil.getSnowflakeNextId());
+        ticket.setCreateTime(now);
+        ticket.setUpdateTime(now);
+        ticketMapper.insert(ticket);
     }
 
     /**
