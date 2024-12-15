@@ -78,7 +78,7 @@ public class DailyTrainTicketService {
         // 创建DailyTrainTicket示例对象，用于构造查询条件
         DailyTrainTicketExample dailyTrainTicketExample = new DailyTrainTicketExample();
         //根据id倒序排序
-        dailyTrainTicketExample.setOrderByClause("id desc");
+        dailyTrainTicketExample.setOrderByClause("id desc,train_code asc");
         // 创建查询条件对象
         DailyTrainTicketExample.Criteria criteria = dailyTrainTicketExample.createCriteria();
 
