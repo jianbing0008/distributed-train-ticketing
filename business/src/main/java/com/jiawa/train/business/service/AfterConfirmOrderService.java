@@ -1,8 +1,11 @@
 package com.jiawa.train.business.service;
 
+import com.jiawa.train.business.domain.ConfirmOrder;
 import com.jiawa.train.business.domain.DailyTrainSeat;
 import com.jiawa.train.business.domain.DailyTrainTicket;
+import com.jiawa.train.business.enums.ConfirmOrderStatusEnum;
 import com.jiawa.train.business.feign.MemberFeign;
+import com.jiawa.train.business.mapper.ConfirmOrderMapper;
 import com.jiawa.train.business.mapper.DailyTrainSeatMapper;
 import com.jiawa.train.business.mapper.cust.DailyTrainTicketMapperCust;
 import com.jiawa.train.business.req.ConfirmOrderTicketReq;
@@ -28,6 +31,9 @@ public class AfterConfirmOrderService {
     private DailyTrainTicketMapperCust dailyTrainTicketMapperCust;
     @Autowired
     private MemberFeign memberFeign;
+    @Autowired
+    private ConfirmOrderMapper confirmOrderMapper;
+
 
 
     /**
@@ -39,7 +45,10 @@ public class AfterConfirmOrderService {
      * @param finalSeatList
      */
     @Transactional
-    public void afterDoConfirm(DailyTrainTicket dailyTrainTicket,List<DailyTrainSeat> finalSeatList,List<ConfirmOrderTicketReq> tickets) {
+    public void afterDoConfirm(DailyTrainTicket dailyTrainTicket,
+                               List<DailyTrainSeat> finalSeatList,
+                               List<ConfirmOrderTicketReq> tickets,
+                               ConfirmOrder confirmOrder) {
         for (int j = 0; j < finalSeatList.size(); j++) {
             DailyTrainSeat dailyTrainSeat = finalSeatList.get(j);
             DailyTrainSeat seatForUpdate = new DailyTrainSeat();
@@ -137,6 +146,12 @@ public class AfterConfirmOrderService {
                 memberTicketReq.setUpdateTime(dailyTrainTicket.getUpdateTime());
                 CommonResp<Object> commonResp = memberFeign.save(memberTicketReq);
                 log.info("调用member，返回：{}",commonResp);
+
+            ConfirmOrder confirmOrderStatus = new ConfirmOrder();
+            confirmOrderStatus.setId(confirmOrder.getId());
+            confirmOrderStatus.setStatus(ConfirmOrderStatusEnum.SUCCESS.getCode());
+            confirmOrderMapper.updateByPrimaryKeySelective(confirmOrderStatus);
+
 
 
         }
