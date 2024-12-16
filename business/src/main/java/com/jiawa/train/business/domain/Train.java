@@ -1,8 +1,9 @@
 package com.jiawa.train.business.domain;
 
+import java.io.Serializable;
 import java.util.Date;
-
-public class Train {
+//当一个类需要保存起来，下次再还原成类时就需要序列化，或者需要远程传输，比如放到redis里面，也需要序列化
+public class Train implements Serializable {
     private Long id;
 
     private String code;
