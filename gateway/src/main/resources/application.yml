@@ -9,7 +9,8 @@ spring:
         - id: member
           predicates:
             - Path=/member/**
-          uri: http://127.0.0.1:8001
+#          uri: http://127.0.0.1:8001
+          uri: lb://member #lb: load balance负载均衡
         - id: business
           predicates:
             - Path=/business/**
