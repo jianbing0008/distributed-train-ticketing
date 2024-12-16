@@ -1,4 +1,4 @@
-GET http://localhost:8000/business/admin/daily-train-ticket/query-list?page=2&size=5&traincode=G13&start=上海&end=杭州
+GET http://localhost:8000/business/admin/daily-train-ticket/query-list?page=1&size=5&traincode=G13&start=上海&end=杭州
 Accept: application/json
 
 ###
