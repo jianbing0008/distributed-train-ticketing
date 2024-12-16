@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: member
+  profiles:
+    #启动环境，nacos会根据环境读不同的配置dataId: member-dev.yml
+    active: dev
+    #注册中心的名字
+  cloud:
+    nacos:
+      config:
+        server-addr: 127.0.0.1:8848
+        file-extension: yaml
+        group: DEFAULT_GROUP
+        prefix: member
