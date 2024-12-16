@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Date;
 
-@FeignClient(name = "business", url = "http://127.0.0.1:8002/business") //表示这是一个Feign客户端，用于调用业务服务
+@FeignClient("business")
+//@FeignClient(name = "business", url = "http://127.0.0.1:8002/business") //表示这是一个Feign客户端，用于调用业务服务
 public interface BusinessFeign {
 
-    @GetMapping("/hello")
+    @GetMapping("/business/hello")
     String hello();
 
     @GetMapping("/admin/daily-train/gen-daily/{date}")
