@@ -19,6 +19,7 @@ import com.jiawa.train.common.util.SnowUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -115,8 +116,11 @@ public class TrainService {
         trainMapper.deleteByPrimaryKey(id);
     }
 
+    @Transactional
     public List<TrainQueryResp> queryAll(){
         List<Train> trainList = selectAll();
+//        log.info("在查一次");
+//        trainList = selectAll();
         // 将查询结果列表转换为目标响应对象列表
         return BeanUtil.copyToList(trainList, TrainQueryResp.class);
     }
