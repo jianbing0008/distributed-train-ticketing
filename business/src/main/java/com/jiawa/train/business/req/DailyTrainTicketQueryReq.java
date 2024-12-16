@@ -2,6 +2,7 @@ package com.jiawa.train.business.req;
 
 import com.jiawa.train.common.req.PageReq;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -9,6 +10,7 @@ import java.util.Date;
 
 @Data
 @ToString
+@EqualsAndHashCode(callSuper = true) // 继承父类的equals和hashCode方法
 public class DailyTrainTicketQueryReq extends PageReq {
     /**
      * 日期

@@ -8,7 +8,10 @@ import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jiawa.train.business.domain.*;
+import com.jiawa.train.business.domain.DailyTrain;
+import com.jiawa.train.business.domain.DailyTrainTicket;
+import com.jiawa.train.business.domain.DailyTrainTicketExample;
+import com.jiawa.train.business.domain.TrainStation;
 import com.jiawa.train.business.enums.SeatTypeEnum;
 import com.jiawa.train.business.enums.TrainTypeEnum;
 import com.jiawa.train.business.mapper.DailyTrainTicketMapper;
@@ -19,6 +22,7 @@ import com.jiawa.train.common.resp.PageResp;
 import com.jiawa.train.common.util.SnowUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,6 +78,8 @@ public class DailyTrainTicketService {
      *
      * @param req DailyTrainTicket查询请求对象，可能包含DailyTrainTicket的会员ID等查询条件
      */
+//    @CachePut(value = "DailyTrainTicketService.queryList")
+    @Cacheable(value = "DailyTrainTicketService.queryList")
     public PageResp<DailyTrainTicketQueryResp> queryList(DailyTrainTicketQueryReq req){
         // 创建DailyTrainTicket示例对象，用于构造查询条件
         DailyTrainTicketExample dailyTrainTicketExample = new DailyTrainTicketExample();
