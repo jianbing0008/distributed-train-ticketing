@@ -14,11 +14,13 @@ spring:
         - id: business
           predicates:
             - Path=/business/**
-          uri: http://127.0.0.1:8002
+#          uri: http://127.0.0.1:8002
+          uri: lb://business
         - id: batch
           predicates:
             - Path=/batch/**
-          uri: http://127.0.0.1:8003
+#          uri: http://127.0.0.1:8003
+          uri: lb://batch
 
       # 允许请求来源（老版本叫allowedOrigin）        跨域请求问题
       globalcors:
