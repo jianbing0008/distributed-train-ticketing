@@ -1,6 +1,7 @@
 // 定义会话存储的键名常量
 SESSION_ORDER = "SESSION_ORDER";
 SESSION_TICKET_PARAMS = "SESSION_TICKET_PARAMS";
+SESSION_ALL_TRAIN = "SESSION_ALL_TRAIN";
 
 /**
  * 提供对会话存储（sessionStorage）的封装，简化存储操作并增强代码可维护性
