@@ -17,7 +17,7 @@ drop table if exists `train`;
 
 create table `train` (
   `id` bigint not null comment 'id',
-  `trainCode` varchar(20) not null comment '车次编号',
+  `code` varchar(20) not null comment '车次编号',
   `type` char(1) not null comment '车次类型|枚举[TrainTypeEnum]',
   `start` varchar(20) not null comment '始发站',
   `start_pinyin` varchar(50) not null comment '始发站拼音',
@@ -28,7 +28,7 @@ create table `train` (
   `create_time` datetime(3) comment '新增时间',
   `update_time` datetime(3) comment '修改时间',
   primary key (`id`),
-  unique key `code_unique` (`trainCode`)
+  unique key `code_unique` (`code`)
 ) engine=innodb default charset=utf8mb4 comment='车次';
 
 
