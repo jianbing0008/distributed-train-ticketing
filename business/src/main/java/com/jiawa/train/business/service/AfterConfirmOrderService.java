@@ -12,6 +12,8 @@ import com.jiawa.train.business.req.ConfirmOrderTicketReq;
 import com.jiawa.train.common.context.LoginMemberContext;
 import com.jiawa.train.common.req.MemberTicketReq;
 import com.jiawa.train.common.resp.CommonResp;
+import io.seata.core.context.RootContext;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import java.util.List;
 
 @Service
 @Slf4j
+
 
 public class AfterConfirmOrderService {
 
@@ -44,11 +47,13 @@ public class AfterConfirmOrderService {
      * 更新确认订单为成功
      * @param finalSeatList
      */
-    @Transactional
+    //@Transactional
+    @GlobalTransactional
     public void afterDoConfirm(DailyTrainTicket dailyTrainTicket,
                                List<DailyTrainSeat> finalSeatList,
                                List<ConfirmOrderTicketReq> tickets,
                                ConfirmOrder confirmOrder) {
+        log.info("seata全局事务ID：{}", RootContext.getXID());
         for (int j = 0; j < finalSeatList.size(); j++) {
             DailyTrainSeat dailyTrainSeat = finalSeatList.get(j);
             DailyTrainSeat seatForUpdate = new DailyTrainSeat();

@@ -13,6 +13,7 @@ import com.jiawa.train.member.domain.TicketExample;
 import com.jiawa.train.member.mapper.TicketMapper;
 import com.jiawa.train.member.req.TicketQueryReq;
 import com.jiawa.train.member.resp.TicketQueryResp;
+import io.seata.core.context.RootContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,13 +32,18 @@ public class TicketService {
 
 
 
-    public void save(MemberTicketReq req) {
+    public void save(MemberTicketReq req) throws Exception {
+        log.info("seata全局事务ID save：{}", RootContext.getXID());
         DateTime now = DateTime.now();
         Ticket ticket = BeanUtil.copyProperties(req, Ticket.class);
         ticket.setId(SnowUtil.getSnowflakeNextId());
         ticket.setCreateTime(now);
         ticket.setUpdateTime(now);
         ticketMapper.insert(ticket);
+        //模拟事务出现异常
+//        if(1 == 1){
+//            throw new Exception("测试异常111");
+//        }
     }
 
     /**
