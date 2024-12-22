@@ -1,0 +1,19 @@
+POST http://localhost:8000/business/confirm-order/do
+Content-Type: application/json
+token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3MzQ4NTYwMTIsIm1vYmlsZSI6IjEzOTU4ODU4MDU0IiwiaWQiOjE4NzAwODk2MjkxNzMxNTc4ODgsImV4cCI6MTczNDk0MjQxMiwiaWF0IjoxNzM0ODU2MDEyfQ.Bd80My4g-SHMWMWH0-lLOyPi3_7hFXUMnoJPmYASFLo
+
+{
+  "dailyTrainTicketId":1870094525343600640,
+  "date":1735660800000,
+  "end":"天津",
+  "start":"北京",
+  "tickets":
+  [{"passengerId":1870094383295107072,
+    "passengerIdCard":"1111",
+    "passengerName":"蔡徐坤",
+    "passengerType":"1",
+    "seatTypeCode":"1"
+  }],
+  "trainCode":"G12"
+}
+###
