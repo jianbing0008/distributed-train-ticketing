@@ -213,12 +213,12 @@ public class ConfirmOrderService {
             // 余票详情表修改余票；
             // 为会员增加购票记录
             // 更新确认订单为成功
-        try{
+//        try{
             afterConfirmOrderService.afterDoConfirm(dailyTrainTicket,finalSeatList,req.getTickets(),confirmOrder);
-        }catch (Exception e){
-            log.error("保存购票信息失败 ", e);
-            throw new BusinessException(BusinessExceptionEnum.BUSINESS_CONFIRM_ORDER_ERROR);
-        }
+//        }catch (Exception e){
+//            log.error("保存购票信息失败 ", e);
+//            throw new BusinessException(BusinessExceptionEnum.BUSINESS_CONFIRM_ORDER_ERROR);
+//        }
     }
 
     /**

@@ -41,9 +41,9 @@ public class TicketService {
         ticket.setUpdateTime(now);
         ticketMapper.insert(ticket);
         //模拟事务出现异常
-        if(1 == 1){
-            throw new Exception("测试异常111");
-        }
+//        if(1 == 1){
+//            throw new Exception("测试异常111");
+//        }
     }
 
     /**
