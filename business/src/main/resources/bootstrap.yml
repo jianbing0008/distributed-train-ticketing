@@ -19,9 +19,28 @@ spring:
         namespace: train
 
 seata:
+  registry:
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: 127.0.0.1:8848
+      group: SEATA_GROUP
+      namespace: train
+      username: nacos
+      password: nacos
+  config:
+    type: nacos
+    nacos:
+      server-addr: 127.0.0.1:8848
+      group: SEATA_GROUP
+      namespace: train
+      dataId: seataServer.properties
+      username: nacos
+      password: nacos
   tx-service-group: train-group
-  service:
-    vgroup-mapping:
-      train-group: default
-    grouplist:
-      default: 127.0.0.1:8091
+  # 以下两行若需要启用可取消注释并按需配置
+  # service:
+  #   vgroup-mapping:
+  #     test-group: default
+  #   grouplist:
+  #     default: 127.0.0.1:8091
