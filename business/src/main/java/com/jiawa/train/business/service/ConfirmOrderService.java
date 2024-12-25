@@ -26,11 +26,13 @@ import com.jiawa.train.common.resp.PageResp;
 import com.jiawa.train.common.util.SnowUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -49,6 +51,8 @@ public class ConfirmOrderService {
     private DailyTrainSeatService dailyTrainSeatService;
     @Autowired
     private AfterConfirmOrderService afterConfirmOrderService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     /**
      * 保存ConfirmOrder信息
@@ -119,7 +123,16 @@ public class ConfirmOrderService {
     }
 
 
-    public void doConfirm(ConfirmOrderDoReq req){
+    public  void doConfirm(ConfirmOrderDoReq req){
+        String key = req.getDate() + "-" + req.getTrainCode();
+        Boolean setIfAbsent = redisTemplate.opsForValue().setIfAbsent(key, key, 5, TimeUnit.SECONDS);
+        if(setIfAbsent){
+            log.info("------------------获取分布式锁-----------------");
+        }else {
+            //只是没抢到锁，并不知道票抢完了没，所以提示稍后再试
+            log.info("------------------没抢到锁-----------------");
+            throw new BusinessException(BusinessExceptionEnum.BUSINESS_CONFIRM_LOCK_ERROR);
+        }
         // 省略业务数据校验，如：车次是否存在，余票是否存在，车次是否在有效期内，tickets条数>0，同乘客同车次是否已买过
 
         // 保存确认订单表，状态初始
