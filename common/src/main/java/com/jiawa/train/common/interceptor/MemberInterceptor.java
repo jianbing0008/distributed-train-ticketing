@@ -23,6 +23,7 @@ public class MemberInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        LOG.info("MemberInterceptor开始");
         String token = request.getHeader("token");
         if(StrUtil.isNotBlank(token)) {
             LOG.info("获取会员登录token：{}", token);
@@ -31,6 +32,7 @@ public class MemberInterceptor implements HandlerInterceptor {
             LOG.info("当前登录会员：{}", member);
             LoginMemberContext.setMember(member);
         }
+        LOG.info("MemberInterceptor结束");
         return true;
     }
 }

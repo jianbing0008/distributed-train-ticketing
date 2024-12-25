@@ -21,10 +21,10 @@ public class SpringMvcConfig implements WebMvcConfigurer {
 
         registry.addInterceptor(memberInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns(
-                        "/member/hello",
-                        "/member/sendCode",
-                        "/member/login"
+                .excludePathPatterns(//将context-path去除，不然不会排除掉这些接口
+                        "/hello",
+                        "/sendCode",
+                        "/login"
                 );
 
     }
