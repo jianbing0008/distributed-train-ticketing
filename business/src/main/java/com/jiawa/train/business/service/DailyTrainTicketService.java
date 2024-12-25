@@ -79,7 +79,7 @@ public class DailyTrainTicketService {
      * @param req DailyTrainTicket查询请求对象，可能包含DailyTrainTicket的会员ID等查询条件
      */
 //    @CachePut(value = "DailyTrainTicketService.queryList")
-    @Cacheable(value = "DailyTrainTicketService.queryList")
+//    @Cacheable(value = "DailyTrainTicketService.queryList")
     public PageResp<DailyTrainTicketQueryResp> queryList(DailyTrainTicketQueryReq req){
         // 创建DailyTrainTicket示例对象，用于构造查询条件
         DailyTrainTicketExample dailyTrainTicketExample = new DailyTrainTicketExample();
