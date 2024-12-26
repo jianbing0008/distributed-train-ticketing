@@ -22,12 +22,12 @@ spring:
         port: 8719
         dashboard: localhost:18080
       datasource:
-        nacos:
+        flow:
           nacos:
-            serverAddr: localhost:8848
+            serverAddr: 127.0.0.1:8848
             namespace: train
-            groupId: TRAIN_GROUP
-            dataId: sentinel
+            groupId: DEFAULT_GROUP
+            dataId: sentinel-business-flow
             ruleType: flow
 
 seata:
