@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jiawa.train.business.mapper.cust.SkTokenMapperCust;
 import com.jiawa.train.common.resp.PageResp;
 import com.jiawa.train.common.util.SnowUtil;
 import com.jiawa.train.business.domain.SkToken;
@@ -36,6 +37,8 @@ public class SkTokenService {
 
     @Autowired
     private DailyTrainStationService dailyTrainStationService;
+    @Autowired
+    private SkTokenMapperCust skTokenMapperCust;
 
     public void genDaily(Date date, String trainCode) {
         log.info("删除日期【{}】车次【{}】的令牌记录", DateUtil.formatDate(date), trainCode);
@@ -63,6 +66,11 @@ public class SkTokenService {
         skToken.setCount(count);
 
         skTokenMapper.insert(skToken);
+    }
+
+    public boolean validToken(Date date, String trainCode, Long MenberId){
+        log.info("验证会员【{}】车次【{}】日期【{}】的令牌", MenberId, trainCode, DateUtil.formatDate(date));
+        return skTokenMapperCust.decrease(date, trainCode) > 0;
     }
 
     /**
