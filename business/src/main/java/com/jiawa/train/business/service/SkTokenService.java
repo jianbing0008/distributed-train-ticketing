@@ -17,10 +17,12 @@ import com.jiawa.train.business.req.SkTokenSaveReq;
 import com.jiawa.train.business.resp.SkTokenQueryResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -39,6 +41,8 @@ public class SkTokenService {
     private DailyTrainStationService dailyTrainStationService;
     @Autowired
     private SkTokenMapperCust skTokenMapperCust;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     public void genDaily(Date date, String trainCode) {
         log.info("删除日期【{}】车次【{}】的令牌记录", DateUtil.formatDate(date), trainCode);
@@ -70,6 +74,16 @@ public class SkTokenService {
 
     public boolean validToken(Date date, String trainCode, Long MenberId){
         log.info("验证会员【{}】车次【{}】日期【{}】的令牌", MenberId, trainCode, DateUtil.formatDate(date));
+        // 先获取令牌锁，再校验令牌余量，防止机器人抢票，lockKey就是令牌，用来表示【谁能做什么】的一个凭证
+        String lockKey = DateUtil.formatDate(date)+'-'+trainCode+'-'+MenberId;
+        Boolean setIfAbsent = redisTemplate.opsForValue().setIfAbsent(lockKey, lockKey, 5, TimeUnit.SECONDS);
+        if (Boolean.TRUE.equals(setIfAbsent)) {
+            log.info("恭喜，抢到令牌锁了！lockKey：{}", lockKey);
+        } else {
+            log.info("很遗憾，没抢到令牌锁！lockKey：{}", lockKey);
+            return false;
+        }
+        // 令牌约等于库存，令牌没有了，就不再卖票，不需要再进入购票主流程去判断库存，判断令牌肯定比判断库存效率高
         return skTokenMapperCust.decrease(date, trainCode) > 0;
     }
 
