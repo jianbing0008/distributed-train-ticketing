@@ -19,6 +19,12 @@ public class CommonResp<T> {
     public CommonResp() {
     }
 
+    public CommonResp(boolean success, String message, T content) {
+        this.success = success;
+        this.message = message;
+        this.content = content;
+    }
+
     /**
      * 构造一个CommonResp对象
      * 该构造函数允许将指定内容封装到响应对象中
