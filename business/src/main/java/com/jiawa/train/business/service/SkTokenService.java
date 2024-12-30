@@ -20,6 +20,7 @@ import com.jiawa.train.business.resp.SkTokenQueryResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -41,10 +42,12 @@ public class SkTokenService {
 
     @Autowired
     private DailyTrainStationService dailyTrainStationService;
+
     @Autowired
     private SkTokenMapperCust skTokenMapperCust;
+
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     public void genDaily(Date date, String trainCode) {
         log.info("删除日期【{}】车次【{}】的令牌记录", DateUtil.formatDate(date), trainCode);
@@ -67,15 +70,20 @@ public class SkTokenService {
         log.info("车次【{}】到站数：{}", trainCode, stationCount);
 
         // 3/4需要根据实际卖票比例来定，一趟火车最多可以卖（seatCount * stationCount）张火车票
-        int count = (int) (seatCount * stationCount * 3/4);
+        int count = (int) (seatCount * stationCount * 3 / 4);
         log.info("车次【{}】初始生成令牌数：{}", trainCode, count);
         skToken.setCount(count);
 
         skTokenMapper.insert(skToken);
+
+        // 将初始令牌数量放入 Redis 缓存，确保是整数
+        String skTokenCountKey = RedisKeyPreEnum.SK_TOKEN_COUNT + "-" + DateUtil.formatDate(date) + "-" + trainCode;
+        redisTemplate.opsForValue().set(skTokenCountKey, String.valueOf(count), 60, TimeUnit.SECONDS);
     }
 
-    public boolean validToken(Date date, String trainCode, Long memberId){
-        log.info("验证会员【{}】车次【{}】日期【{}】的令牌", memberId, trainCode, DateUtil.formatDate(date));
+    public boolean validSkToken(Date date, String trainCode, Long memberId) {
+        log.info("会员【{}】获取日期【{}】车次【{}】的令牌开始", memberId, DateUtil.formatDate(date), trainCode);
+
         // 先获取令牌锁，再校验令牌余量，防止机器人抢票，lockKey就是令牌，用来表示【谁能做什么】的一个凭证
         String lockKey = RedisKeyPreEnum.SK_TOKEN + "-" + DateUtil.formatDate(date) + "-" + trainCode + "-" + memberId;
         Boolean setIfAbsent = redisTemplate.opsForValue().setIfAbsent(lockKey, lockKey, 5, TimeUnit.SECONDS);
@@ -85,24 +93,32 @@ public class SkTokenService {
             log.info("很遗憾，没抢到令牌锁！lockKey：{}", lockKey);
             return false;
         }
+
         String skTokenCountKey = RedisKeyPreEnum.SK_TOKEN_COUNT + "-" + DateUtil.formatDate(date) + "-" + trainCode;
-        Object skTokenCount = redisTemplate.opsForValue().get(skTokenCountKey);
-        if(skTokenCount!=null){
+        ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
+        String skTokenCountStr = valueOps.get(skTokenCountKey);
+        if (skTokenCountStr != null) {
             log.info("缓存中有该车次令牌大闸的key：{}", skTokenCountKey);
-            Long count = redisTemplate.opsForValue().decrement(skTokenCountKey, 1);
-            redisTemplate.expire(skTokenCountKey, 60, TimeUnit.SECONDS);
-            if (count < 0L) {
-                log.error("获取令牌失败：{}", skTokenCountKey);
-                return false;
-            } else {
-                log.info("获取令牌后，令牌余数：{}", count);
-                // 每获取5个令牌更新一次数据库
-                if (count % 5 == 0) {
-                    skTokenMapperCust.decrease(date, trainCode, 5);
+            try {
+                Long count = Long.parseLong(skTokenCountStr);
+                count = valueOps.decrement(skTokenCountKey, 1);
+                redisTemplate.expire(skTokenCountKey, 60, TimeUnit.SECONDS);
+                if (count < 0L) {
+                    log.error("获取令牌失败：{}", skTokenCountKey);
+                    return false;
+                } else {
+                    log.info("获取令牌后，令牌余数：{}", count);
+                    // 每获取5个令牌更新一次数据库
+                    if (count % 5 == 0) {
+                        skTokenMapperCust.decrease(date, trainCode, 5);
+                    }
+                    return true;
                 }
-                return true;
+            } catch (NumberFormatException e) {
+                log.error("Redis 中的令牌数量格式不正确：{}", skTokenCountKey, e);
+                return false;
             }
-        }else{
+        } else {
             log.info("缓存中没有该车次令牌大闸的key：{}", skTokenCountKey);
             // 检查是否还有令牌
             SkTokenExample skTokenExample = new SkTokenExample();
@@ -128,9 +144,6 @@ public class SkTokenService {
             redisTemplate.opsForValue().set(skTokenCountKey, String.valueOf(count), 60, TimeUnit.SECONDS);
             return true;
         }
-
-        // 令牌约等于库存，令牌没有了，就不再卖票，不需要再进入购票主流程去判断库存，判断令牌肯定比判断库存效率高
-//        return skTokenMapperCust.decrease(date, trainCode) > 0;
     }
 
     /**
@@ -138,12 +151,12 @@ public class SkTokenService {
      *
      * @param req SkToken保存请求对象，包含SkToken的基本信息
      */
-    public void save(SkTokenSaveReq req){
+    public void save(SkTokenSaveReq req) {
         // 获取当前时间，用于记录SkToken信息的创建和更新时间
         DateTime now = DateTime.now();
         // 将请求对象转换为SkToken对象，便于后续操作
         SkToken skToken = BeanUtil.copyProperties(req, SkToken.class);
-        if(ObjectUtil.isNull(req.getId())){ // 判断是否为空，为空则是新增SkToken
+        if (ObjectUtil.isNull(req.getId())) { // 判断是否为空，为空则是新增SkToken
             // 设置SkToken的会员ID，来源于登录会员上下文
             // 生成SkToken的唯一ID
             skToken.setId(SnowUtil.getSnowflakeNextId());
@@ -152,11 +165,10 @@ public class SkTokenService {
             skToken.setUpdateTime(now);
             // 插入SkToken信息到数据库
             skTokenMapper.insert(skToken);
-        }else{  // 不为空则更新SkToken信息
+        } else {  // 不为空则更新SkToken信息
             skToken.setUpdateTime(now);
             skTokenMapper.updateByPrimaryKey(skToken);
         }
-
     }
 
     /**
@@ -164,20 +176,19 @@ public class SkTokenService {
      *
      * @param req SkToken查询请求对象，可能包含SkToken的会员ID等查询条件
      */
-    public PageResp<SkTokenQueryResp> queryList(SkTokenQueryReq req){
+    public PageResp<SkTokenQueryResp> queryList(SkTokenQueryReq req) {
         // 创建SkToken示例对象，用于构造查询条件
         SkTokenExample skTokenExample = new SkTokenExample();
-        //根据id倒序排序
+        // 根据id倒序排序
         skTokenExample.setOrderByClause("id desc");
         // 创建查询条件对象
         SkTokenExample.Criteria criteria = skTokenExample.createCriteria();
-
 
         // 记录查询日志
         log.info("查询页码：{}", req.getPage());
         log.info("每页条数：{}", req.getSize());
         // 启用分页查询
-        PageHelper.startPage(req.getPage(),req.getSize());
+        PageHelper.startPage(req.getPage(), req.getSize());
         // 根据构造的查询条件，从数据库中选择符合条件的SkToken信息
         List<SkToken> skTokenList = skTokenMapper.selectByExample(skTokenExample);
 
@@ -200,5 +211,4 @@ public class SkTokenService {
     public void delete(Long id) {
         skTokenMapper.deleteByPrimaryKey(id);
     }
-
 }
