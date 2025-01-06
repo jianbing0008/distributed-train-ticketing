@@ -3,6 +3,7 @@ package com.jiawa.train.business.controller;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.jiawa.train.business.req.ConfirmOrderDoReq;
+import com.jiawa.train.business.service.BeforeConfirmOrderService;
 import com.jiawa.train.business.service.ConfirmOrderService;
 import com.jiawa.train.common.exception.BusinessExceptionEnum;
 import com.jiawa.train.common.resp.CommonResp;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConfirmOrderController {
     @Autowired
     private ConfirmOrderService confirmOrderService;
+    @Autowired
+    private BeforeConfirmOrderService beforeConfirmOrderService;
     @Autowired
     private StringRedisTemplate redisTemplate;
 
@@ -45,7 +48,8 @@ public class ConfirmOrderController {
             redisTemplate.delete(imageCodeToken);
         }
 
-        confirmOrderService.doConfirm(req);
+//        confirmOrderService.doConfirm(req);
+        beforeConfirmOrderService.beforeDoConfirm(req);
         return new CommonResp<>();
     }
 
