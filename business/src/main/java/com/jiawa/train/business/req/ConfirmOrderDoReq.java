@@ -70,6 +70,11 @@ public class ConfirmOrderDoReq {
     private String imageCodeToken;
 
 
+    /**
+     * 日志跟踪号
+     */
+    private String logId;
+
 
 
 }
