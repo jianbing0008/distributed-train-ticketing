@@ -146,8 +146,9 @@ public class ConfirmOrderService {
                 log.info("恭喜，抢到锁了！");
             } else {
                 // 只是没抢到锁，并不知道票抢完了没，所以提示稍候再试
-                log.info("很遗憾，没抢到锁");
-                throw new BusinessException(BusinessExceptionEnum.BUSINESS_CONFIRM_LOCK_ERROR);
+                log.info("很遗憾，没抢到锁,有其他消费线程正在处理订单");
+                return;
+//                throw new BusinessException(BusinessExceptionEnum.BUSINESS_CONFIRM_LOCK_ERROR);
             }
             // 由先抢到分布式锁的消费者处理所有同期车次初始化订单
             while (true) {
@@ -166,7 +167,20 @@ public class ConfirmOrderService {
                 }else{
                     log.info("本次处理{}条订单",list.size());
                 }
-                list.forEach(this::sell);
+                // 一条一条卖
+                list.forEach(confirmOrder -> {
+                    try {
+                        sell(confirmOrder);
+                    } catch (BusinessException e) {
+                        if(e.equals(BusinessExceptionEnum.CONFIRM_ORDER_TICKET_COUNT_ERROR)) {// 余票不足
+                            // 这里处理失败下一订单，是因为当前订单没票，不代表同一车次不同站没票
+                            log.info("本订单余票不足，继续售卖下一个订单");
+                            confirmOrder.setStatus(ConfirmOrderStatusEnum.FAILURE.getCode());
+                        }else{
+                            throw e;
+                        }
+                    }
+                });
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
