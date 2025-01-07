@@ -55,8 +55,8 @@ public class ConfirmOrderController {
         }
 
 //        confirmOrderService.doConfirm(req);
-        beforeConfirmOrderService.beforeDoConfirm(req);
-        return new CommonResp<>();
+        Long id = beforeConfirmOrderService.beforeDoConfirm(req);
+        return new CommonResp<>(String.valueOf(id));
     }
 
     /**

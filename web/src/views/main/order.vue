@@ -134,7 +134,7 @@
   <a-modal v-model:visible="lineModalVisible" :title="null" :footer="null" :maskClosable="false" :closable="false"
            style="top: 50px; width: 400px">
     <div class="book-line">
-      <loading-outlined /> 系统正在处理中...
+      <loading-outlined /> 确认订单：{{confirmOrderId}}},系统正在处理中...
     </div>
   </a-modal>
 
@@ -162,6 +162,7 @@ export default defineComponent({
     const tickets = ref([]);
     const visible = ref(false);
     const lineModalVisible = ref();
+    const confirmOrderId = ref();
 
     // 0：不支持选座；1：选一等座；2：选二等座
     const chooseSeatType = ref(0);
@@ -240,6 +241,7 @@ export default defineComponent({
           visible.value = false;
           imageCodeModalVisible.value = false;
           lineModalVisible.value = true;
+          confirmOrderId.value = data.content;
         } else {
           notification.error({description: data.message});
         }
@@ -483,6 +485,7 @@ export default defineComponent({
       showFirstImageCodeModal,
       loadFirstImageCode,
       lineModalVisible,
+      confirmOrderId,
     }
   }
 })
