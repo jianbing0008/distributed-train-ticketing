@@ -10,5 +10,11 @@ Accept: application/json
 DELETE http://localhost:8000/business/admin/train/delete/123
 Accept: application/json
 
-### 当你使用sql的增删改时，mybatis的二级缓存就会失效
+###
+
+GET http://localhost:8000/business/confirm-order/query-line-count/1876517051015761920
+Accept: application/json
+token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3MzYyMjIwOTcsIm1vYmlsZSI6IjEzOTU4ODU4MDU0IiwiaWQiOjE4NzAwODk2MjkxNzMxNTc4ODgsImV4cCI6MTczNjMwODQ5NywiaWF0IjoxNzM2MjIyMDk3fQ.K0Yr0OxlbHGfIhu3elpCSmupkMqFbGPC_FThZAcnuaU
+
+###
 

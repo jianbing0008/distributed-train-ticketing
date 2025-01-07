@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/confirm-order")
@@ -60,6 +57,18 @@ public class ConfirmOrderController {
     }
 
     /**
+     * 查询排队人数
+     * @param id
+     * @return
+     */
+    @GetMapping("/query-line-count/{id}")
+    public CommonResp<Integer> queryLineCount(@PathVariable Long id) {
+        Integer count = confirmOrderService.queryLineCount(id);
+        log.info("当前排在第{}位等出票",count);
+        return new CommonResp<>(count);
+    }
+
+    /**
      * 降级方法，需包含原方法的所有参数和BlockException参数
      * @param req
      * @param e
@@ -72,7 +81,5 @@ public class ConfirmOrderController {
         commonResp.setMessage(BusinessExceptionEnum.CONFIRM_ORDER_FLOW_EXCEPTION.getDesc());
         return commonResp;
     }
-
-
 
 }

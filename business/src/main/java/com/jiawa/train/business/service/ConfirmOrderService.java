@@ -65,6 +65,39 @@ public class ConfirmOrderService {
     private SkTokenService skTokenService;
 
     /**
+     *  查询前面有几个人在排队
+     */
+
+    public Integer queryLineCount(Long id) {
+        ConfirmOrder confirmOrder = confirmOrderMapper.selectByPrimaryKey(id);
+        // 根据订单状态获取枚举
+        ConfirmOrderStatusEnum statusEnum = EnumUtil.getBy(ConfirmOrderStatusEnum::getCode, confirmOrder.getStatus());
+        int result = switch (statusEnum) {
+            case PENDING -> 0;   //排队 0
+            case SUCCESS -> -1;   //成功
+            case FAILURE -> -2;   //失败
+            case EMPTY -> -3;   //无票
+            case CANCEL -> -4;   //排队 0
+            case INIT -> 999;   // 需要查表得到实际排队数量
+        };
+        if(result == 999) {
+            // 排在第几位 where a = 1 and (b=1 or c=1) 等价于 where a = 1 and b=1 or a=1 and c=1
+            ConfirmOrderExample confirmOrderExample = new ConfirmOrderExample();
+            confirmOrderExample.or().andTrainCodeEqualTo(confirmOrder.getTrainCode())
+                    .andDateEqualTo(confirmOrder.getDate())
+                    .andCreateTimeLessThan(confirmOrder.getCreateTime())
+                    .andStatusEqualTo(ConfirmOrderStatusEnum.PENDING.getCode());
+            confirmOrderExample.or().andTrainCodeEqualTo(confirmOrder.getTrainCode())
+                    .andDateEqualTo(confirmOrder.getDate())
+                    .andCreateTimeLessThan(confirmOrder.getCreateTime())
+                    .andStatusEqualTo(ConfirmOrderStatusEnum.INIT.getCode());
+            return Math.toIntExact(confirmOrderMapper.countByExample(confirmOrderExample));
+        }else {
+            return result;
+        }
+    }
+
+    /**
      * 保存ConfirmOrder信息
      *
      * @param req ConfirmOrder保存请求对象，包含ConfirmOrder的基本信息
