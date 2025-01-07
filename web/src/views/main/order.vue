@@ -131,6 +131,13 @@
     </a-modal>
   </div>
 
+  <a-modal v-model:visible="lineModalVisible" :title="null" :footer="null" :maskClosable="false" :closable="false"
+           style="top: 50px; width: 400px">
+    <div class="book-line">
+      <loading-outlined /> 系统正在处理中...
+    </div>
+  </a-modal>
+
 </template>
 
 <script >
@@ -154,6 +161,7 @@ export default defineComponent({
     //乘客的票
     const tickets = ref([]);
     const visible = ref(false);
+    const lineModalVisible = ref();
 
     // 0：不支持选座；1：选一等座；2：选二等座
     const chooseSeatType = ref(0);
@@ -228,7 +236,10 @@ export default defineComponent({
       }).then((response) => {
         let data = response.data;
         if (data.success) {
-          notification.success({description: "下单成功！"})
+          // notification.success({description: "下单成功！"})
+          visible.value = false;
+          imageCodeModalVisible.value = false;
+          lineModalVisible.value = true;
         } else {
           notification.error({description: data.message});
         }
@@ -470,7 +481,8 @@ export default defineComponent({
       firstImageCodeModalVisible,
       validFirstImageCode,
       showFirstImageCodeModal,
-      loadFirstImageCode
+      loadFirstImageCode,
+      lineModalVisible,
     }
   }
 })
