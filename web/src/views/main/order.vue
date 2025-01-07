@@ -134,8 +134,14 @@
   <a-modal v-model:visible="lineModalVisible" :title="null" :footer="null" :maskClosable="false" :closable="false"
            style="top: 50px; width: 400px">
     <div class="book-line">
-      <loading-outlined /> 确认订单：{{confirmOrderId}}},系统正在处理中...
-    </div>
+      <div v-show="confirmOrderLineCount < 0">
+        <loading-outlined /> 系统正在处理中...
+      </div>
+      <div v-show="confirmOrderLineCount >= 0">
+        <loading-outlined /> 您前面还有{{confirmOrderLineCount}}位用户在购票，排队中...
+      </div>
+
+      </div>
   </a-modal>
 
 </template>
@@ -163,6 +169,7 @@ export default defineComponent({
     const visible = ref(false);
     const lineModalVisible = ref();
     const confirmOrderId = ref();
+    const confirmOrderLineCount = ref(-1);
 
     // 0：不支持选座；1：选一等座；2：选二等座
     const chooseSeatType = ref(0);
@@ -242,12 +249,51 @@ export default defineComponent({
           imageCodeModalVisible.value = false;
           lineModalVisible.value = true;
           confirmOrderId.value = data.content;
+          queryLineCount();
         } else {
           notification.error({description: data.message});
         }
       });
-
     }
+
+    /* ------------------- 定时查询订单状态 --------------------- */
+    // 确认订单后定时查询
+    let queryLineCountInterval;
+
+    // 定时查询订单结果/排队数量
+    const queryLineCount = () => {
+      confirmOrderLineCount.value = -1;
+      queryLineCountInterval = setInterval(function () {
+        axios.get("/business/confirm-order/query-line-count/" + confirmOrderId.value).then((response) => {
+          let data = response.data;
+          if (data.success) {
+            let result = data.content;
+            switch (result) {
+              case -1 :
+                notification.success({description: "购票成功！"});
+                lineModalVisible.value = false;
+                clearInterval(queryLineCountInterval);
+                break;
+              case -2:
+                notification.error({description: "购票失败！"});
+                lineModalVisible.value = false;
+                clearInterval(queryLineCountInterval);
+                break;
+              case -3:
+                notification.error({description: "抱歉，没票了！"});
+                lineModalVisible.value = false;
+                clearInterval(queryLineCountInterval);
+                break;
+              default:
+                confirmOrderLineCount.value = result;
+            }
+          } else {
+            notification.error({description: data.message});
+          }
+        });
+      }, 500);
+    };
+
     /*第一层纯前端验证码*/
     const firstImageCodeSourceA = ref();
     const firstImageCodeSourceB = ref();
@@ -486,6 +532,7 @@ export default defineComponent({
       loadFirstImageCode,
       lineModalVisible,
       confirmOrderId,
+      confirmOrderLineCount,
     }
   }
 })

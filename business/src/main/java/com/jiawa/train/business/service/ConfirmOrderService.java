@@ -227,6 +227,12 @@ public class ConfirmOrderService {
     }
 
     private void sell(ConfirmOrder confirmOrder) {
+        // 为了演示排队效果，每次出票增加200毫秒延时
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         // 省略业务数据校验，如：车次是否存在，余票是否存在，车次是否在有效期内，tickets条数>0，同乘客同车次是否已买过
         ConfirmOrderDoReq confirmOrderDoReq = new ConfirmOrderDoReq();
         confirmOrderDoReq.setMemberId(confirmOrder.getMemberId());
